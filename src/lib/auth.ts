@@ -4,6 +4,7 @@ import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { Role } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
+import { vercelTrustedOrigins } from "@/lib/deployment-url";
 import { AuditService } from "@/services/audit/audit-service";
 
 const audit = new AuditService(prisma);
@@ -12,6 +13,16 @@ export const auth = betterAuth({
   appName: "Agroconet",
   baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
+  trustedOrigins: [
+    env.BETTER_AUTH_URL,
+    env.NEXT_PUBLIC_APP_URL,
+    ...vercelTrustedOrigins({
+      environment: process.env.VERCEL_ENV,
+      deploymentHost: process.env.VERCEL_URL,
+      branchHost: process.env.VERCEL_BRANCH_URL,
+      productionHost: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    }),
+  ],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
