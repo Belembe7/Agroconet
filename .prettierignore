@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+build
+coverage
+src/generated
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.agents
+.claude
+.windsurf
+docs
+skills-lock.json
+AGENTS.md
+components.json

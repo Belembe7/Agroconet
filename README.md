@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agroconet
 
-## Getting Started
+Marketplace multi-vendedor de insumos agropecuários com logística própria (Maputo e Matola).
 
-First, run the development server:
+Documentação da Fase 0: [`docs/`](./docs/).
+
+## Pré-requisitos
+
+- Node.js 22 LTS
+- PostgreSQL 16 (recomendado via Docker Desktop)
+- npm 10+
+
+## Arranque rápido
 
 ```bash
+# 1. Dependências
+npm install
+
+# 2. Variáveis de ambiente
+cp .env.example .env
+
+# 3. Base de dados local (requer Docker)
+npm run db:up
+
+# 4. Cliente Prisma
+npm run db:generate
+
+# 5. App
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
+Health: [http://localhost:3000/api/health](http://localhost:3000/api/health).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> **Sem Docker:** instala PostgreSQL localmente e ajusta `DATABASE_URL` no `.env` para o mesmo formato do `.env.example`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Comando                              | Descrição                                                |
+| ------------------------------------ | -------------------------------------------------------- |
+| `npm run dev`                        | Servidor de desenvolvimento                              |
+| `npm run build`                      | Build de produção                                        |
+| `npm run lint`                       | ESLint                                                   |
+| `npm run typecheck`                  | TypeScript sem emitir ficheiros                          |
+| `npm run format`                     | Prettier                                                 |
+| `npm run db:up`                      | Sobe PostgreSQL (Docker Compose)                         |
+| `npm run db:generate`                | Gera o Prisma Client                                     |
+| `npm run db:migrate`                 | Migrations (dev)                                         |
+| `npm run db:migrate:deploy`          | Migrations (deploy)                                      |
+| `npm run db:seed`                    | Seed de desenvolvimento                                  |
+| `npm run worker:expire-reservations` | Cancela pedidos não confirmados e liberta stock expirado |
+| `npm run test`                       | Testes (Vitest)                                          |
+| `npm run test:integration`           | Testes de integração                                     |
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura (resumo)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/           # App Router (storefront, auth, painel, entregador, api)
+  features/      # Domínios (UI + actions)
+  services/      # Regras de negócio (sem dependência de Next)
+  lib/           # db, env, utils
+  config/        # Constantes do site
+prisma/          # Schema e migrations
+docs/            # Arquitetura, BD, segurança, roadmap
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Roadmap
 
-## Deploy on Vercel
+| Fase  | Estado                   | Conteúdo                                                                                                           |
+| ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| 0     | Feita                    | Arquitetura, BD, segurança, roadmap                                                                                |
+| 1     | Feita                    | Setup Next.js, Prisma, Docker, CI, health                                                                          |
+| 2     | Feita                    | Schema, seed, InventoryService, testes                                                                             |
+| 3     | Feita                    | Auth Better Auth, RBAC, OTP mock, áreas                                                                            |
+| 4     | Feita                    | Design system, tokens, componentes UI                                                                              |
+| 5–11  | Implementadas localmente | Landing, marketplace, checkout COD e áreas de operação; validação de performance e funcional pendente              |
+| 12–16 | Parcial / bloqueadas     | Pagamentos reais, canais externos, testes de aceitação e infraestrutura de produção dependem de trabalho adicional |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ver [`docs/ROADMAP.md`](./docs/ROADMAP.md) para o estado atual das fases e respetivos bloqueios.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O estado detalhado e as dependências para lançamento estão em [`docs/PRODUCTION.md`](./docs/PRODUCTION.md). Agendar `npm run worker:expire-reservations` a cada minuto para libertar reservas vencidas; o comando é necessário em staging e produção.
+
+Para preparar uma prévia privada do estado atual na Vercel, consulte [`docs/VERCEL_PREVIEW.md`](./docs/VERCEL_PREVIEW.md). A prévia não equivale a produção nem ativa pagamentos reais.
+
+### Contas de desenvolvimento (após `npm run db:seed`)
+
+Palavra-passe: `AgroconetDev1!`
+
+| Papel       | Telemóvel     | Área          |
+| ----------- | ------------- | ------------- |
+| SUPER_ADMIN | +258840000001 | `/admin`      |
+| ADMIN       | +258840000002 | `/admin`      |
+| SELLER      | +258840000011 | `/vendedor`   |
+| DRIVER      | +258840000021 | `/entregador` |
+| CUSTOMER    | +258840000031 | `/cliente`    |
+
+OTP em desenvolvimento: aparece no terminal do `npm run dev` como `[DEV OTP]`.
+
+## Licença
+
+Projeto privado.

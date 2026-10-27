@@ -1,0 +1,125 @@
+import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { connection } from "next/server";
+import { Brand } from "@/components/layout/brand";
+import { getPublicContacts } from "@/features/landing/data";
+import { getAppSession } from "@/lib/session";
+
+async function ContactDetails() {
+  await connection();
+  let contacts;
+  try {
+    contacts = await getPublicContacts();
+  } catch {
+    return (
+      <p className="text-muted-foreground text-sm">
+        Contactos temporariamente indisponíveis. Tente novamente dentro de
+        instantes.
+      </p>
+    );
+  }
+  if (!contacts || (!contacts.phone && !contacts.email && !contacts.city))
+    return (
+      <p className="text-muted-foreground text-sm">
+        Os contactos estarão disponíveis em breve.
+      </p>
+    );
+  return (
+    <address className="public-contacts">
+      {contacts.phone && (
+        <a href={`tel:${contacts.phone.replace(/[^+0-9]/g, "")}`}>
+          <Phone aria-hidden="true" />
+          {contacts.phone}
+        </a>
+      )}
+      {contacts.email && (
+        <a href={`mailto:${contacts.email}`}>
+          <Mail aria-hidden="true" />
+          {contacts.email}
+        </a>
+      )}
+      {contacts.city && (
+        <p>
+          <MapPin aria-hidden="true" />
+          {contacts.city}
+        </p>
+      )}
+    </address>
+  );
+}
+export { ContactDetails };
+export async function FooterAccountLinks() {
+  const session = await getAppSession();
+  if (!session) {
+    return (
+      <>
+        <Link href="/registar">
+          Criar conta <ArrowUpRight aria-hidden="true" className="size-3" />
+        </Link>
+        <Link href="/entrar">Entrar na sua área</Link>
+      </>
+    );
+  }
+
+  const destination =
+    session.actor.roles.includes("SUPER_ADMIN") ||
+    session.actor.roles.includes("ADMIN")
+      ? "/admin"
+      : session.actor.roles.includes("SELLER")
+        ? "/vendedor"
+        : session.actor.roles.includes("DRIVER")
+          ? "/entregador"
+          : "/cliente";
+
+  return (
+    <>
+      <Link href={destination}>A minha conta</Link>
+      {session.actor.roles.includes("CUSTOMER") ? (
+        <Link href="/cliente/pedidos">Os meus pedidos</Link>
+      ) : null}
+    </>
+  );
+}
+
+export function FooterContent({
+  contacts,
+  accountLinks,
+}: {
+  contacts: React.ReactNode;
+  accountLinks: React.ReactNode;
+}) {
+  return (
+    <footer id="contactos" className="landing-footer">
+      <div className="footer-grid">
+        <div>
+          <Brand />
+          <p className="footer-manifesto">
+            Cultivamos ligações.
+            <br />
+            Fazemos crescer possibilidades.
+          </p>
+          <p className="footer-small">Soluções agropecuárias ao seu alcance.</p>
+        </div>
+        <div>
+          <h2>Explore</h2>
+          <Link href="/#categorias">Categorias</Link>
+          <Link href="/#destaques">Produtos em destaque</Link>
+          <Link href="/#como-funciona">Como funciona</Link>
+        </div>
+        <div>
+          <h2>Faça parte</h2>
+          {accountLinks}
+          <Link href="/#vendedores">Para vendedores</Link>
+        </div>
+        <div>
+          <h2>Vamos conversar?</h2>
+          {contacts}
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>Agroconet · Moçambique</span>
+        <span>Da terra. Com futuro.</span>
+      </div>
+    </footer>
+  );
+}
