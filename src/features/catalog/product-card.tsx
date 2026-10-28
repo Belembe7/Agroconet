@@ -2,13 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Package, Star } from "lucide-react";
 import { PriceTag } from "@/components/shared/price-tag";
-import { categoryImagePosition } from "@/lib/category-image";
-import { productImageUrl } from "@/lib/product-image";
+import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
+import { productImageAsset } from "@/lib/product-image";
 import type { CatalogProductCard } from "@/services/catalog/catalog-service";
 
 export function ProductCard({ product }: { product: CatalogProductCard }) {
-  const categoryPosition = categoryImagePosition(product.category);
-  const productFallbackImage = productImageUrl(product.name);
+  const productFallbackImage = productImageAsset(product.name);
 
   return (
     <Link
@@ -26,24 +25,11 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
             unoptimized={/^https?:\/\//.test(product.imageUrl)}
           />
         ) : productFallbackImage ? (
-          <Image
-            src={productFallbackImage}
-            alt={product.name}
-            fill
+          <ProductFallbackPhoto
+            asset={productFallbackImage}
+            name={product.name}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover"
-          />
-        ) : categoryPosition ? (
-          <div
-            role="img"
-            aria-label={`${product.name}, categoria ${product.category}`}
-            className="absolute inset-0 bg-[#f6f0e5]"
-            style={{
-              backgroundImage: "url('/images/agro-stock-category-sheet.png')",
-              backgroundPosition: categoryPosition,
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "300% 200%",
-            }}
           />
         ) : (
           <>

@@ -15,7 +15,8 @@ import {
 import { normalizeLandingQuery } from "@/services/catalog/landing-service";
 import { PriceTag } from "@/components/shared/price-tag";
 import { categoryImagePosition, categoryImageUrl } from "@/lib/category-image";
-import { productImageUrl } from "@/lib/product-image";
+import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
+import { productImageAsset } from "@/lib/product-image";
 import { getCatalogUnavailableDescription } from "@/features/catalog/messages";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
@@ -240,8 +241,7 @@ export async function LandingHighlights({
       ) : (
         <div className="landing-products">
           {products.map((product) => {
-            const categoryPosition = categoryImagePosition(product.category);
-            const productFallbackImage = productImageUrl(product.name);
+            const productFallbackImage = productImageAsset(product.name);
             return (
               <Link
                 prefetch={false}
@@ -261,25 +261,11 @@ export async function LandingHighlights({
                         className="object-cover"
                       />
                     ) : productFallbackImage ? (
-                      <Image
-                        src={productFallbackImage}
-                        alt={product.name}
-                        fill
+                      <ProductFallbackPhoto
+                        asset={productFallbackImage}
+                        name={product.name}
                         sizes="(max-width: 760px) 50vw, 25vw"
                         className="object-cover"
-                      />
-                    ) : categoryPosition ? (
-                      <div
-                        role="img"
-                        aria-label={`${product.name}, categoria ${product.category}`}
-                        className="absolute inset-0 bg-[#f6f0e5]"
-                        style={{
-                          backgroundImage:
-                            "url('/images/agro-stock-category-sheet.png')",
-                          backgroundPosition: categoryPosition,
-                          backgroundRepeat: "no-repeat",
-                          backgroundSize: "300% 250%",
-                        }}
                       />
                     ) : (
                       <>

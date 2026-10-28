@@ -12,6 +12,7 @@ import {
   Star,
 } from "lucide-react";
 import { PriceTag } from "@/components/shared/price-tag";
+import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
 import { FavoriteToggle } from "@/features/catalog/favorite-toggle";
 import { RelatedProducts } from "@/features/catalog/related-products";
 import { AddToCartForm } from "@/features/cart/add-to-cart-form";
@@ -21,6 +22,7 @@ import { getAppSession } from "@/lib/session";
 import { FavoriteService } from "@/services/catalog/favorite-service";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
+import { productImageAsset } from "@/lib/product-image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -82,6 +84,7 @@ async function ProductContent({ params }: Props) {
   if (!product) notFound();
   if (product.slug !== slug)
     permanentRedirect(`/produtos/${encodeURIComponent(product.slug)}`);
+  const fallbackImage = productImageAsset(product.name);
 
   const schema = {
     "@context": "https://schema.org",
@@ -153,6 +156,15 @@ async function ProductContent({ params }: Props) {
                 priority
                 sizes="(max-width: 800px) 100vw, 50vw"
                 unoptimized={/^https?:\/\//.test(product.images[0].url)}
+              />
+            </div>
+          ) : fallbackImage ? (
+            <div className="product-gallery-main">
+              <ProductFallbackPhoto
+                asset={fallbackImage}
+                name={product.name}
+                sizes="(max-width: 800px) 100vw, 50vw"
+                priority
               />
             </div>
           ) : (

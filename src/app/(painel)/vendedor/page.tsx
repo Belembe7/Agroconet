@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
 import { displayDescription, displayName } from "@/lib/display-name";
-import { categoryImagePosition } from "@/lib/category-image";
-import { productImageUrl } from "@/lib/product-image";
+import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
+import { productImageAsset } from "@/lib/product-image";
 import { prisma } from "@/lib/db";
 import { requireAreaSession } from "@/lib/session";
 import { SellerService } from "@/services/seller/seller-service";
@@ -65,11 +65,9 @@ function safeProductImageUrl(storageKey: string): string | null {
 function ProductStockThumbnail({
   image,
   productName,
-  categoryName,
 }: {
   image: { storageKey: string; alt: string | null } | undefined;
   productName: string;
-  categoryName: string;
 }) {
   const imageUrl = image ? safeProductImageUrl(image.storageKey) : null;
   if (imageUrl)
@@ -86,34 +84,17 @@ function ProductStockThumbnail({
       </div>
     );
 
-  const productFallbackImage = productImageUrl(productName);
+  const productFallbackImage = productImageAsset(productName);
   if (productFallbackImage)
     return (
       <div className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-xl border">
-        <Image
-          src={productFallbackImage}
-          alt={displayName(productName)}
-          fill
+        <ProductFallbackPhoto
+          asset={productFallbackImage}
+          name={displayName(productName)}
           sizes="80px"
           className="object-cover"
         />
       </div>
-    );
-
-  const categoryPosition = categoryImagePosition(categoryName);
-  if (categoryPosition)
-    return (
-      <div
-        role="img"
-        aria-label={`Imagem de ${displayName(categoryName)}`}
-        className="size-20 shrink-0 rounded-xl border bg-[#f6f0e5]"
-        style={{
-          backgroundImage: "url('/images/agro-stock-category-sheet.png')",
-          backgroundPosition: categoryPosition,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "300% 200%",
-        }}
-      />
     );
 
   return (
@@ -414,7 +395,6 @@ async function VendedorHomeContent() {
                       <ProductStockThumbnail
                         image={product.images[0]}
                         productName={product.name}
-                        categoryName={product.category.name}
                       />
                       <div className="min-w-0">
                         <h3 className="font-semibold">
