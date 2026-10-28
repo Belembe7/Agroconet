@@ -27,7 +27,7 @@ O mapa de cobertura usa OpenStreetMap sem chave de API. O planeamento de entrega
 
 ## Base de dados de prévia
 
-Antes de abrir o link ao cliente, aplique as migrations à base Preview com `npm run db:migrate:deploy`, usando a credencial dessa base. As migrations de atendimento e de entrega são necessárias para o chat, os pedidos e as rotas. Não execute `db:seed` numa prévia pública: o seed atual inclui contas de desenvolvimento e uma palavra-passe conhecida.
+O comando de build executa `prisma migrate deploy` antes de compilar o Next.js. Configure `DATABASE_URL` para o ambiente do deploy; sem acesso à base ou se uma migration falhar, a publicação pára antes de entrar no ar. As migrations de atendimento e de entrega são necessárias para o chat, os pedidos e as rotas. Não execute `db:seed` numa prévia pública: o seed atual inclui contas de desenvolvimento e uma palavra-passe conhecida.
 
 Para carregar o catálogo fictício de avaliação, use `db:seed:demo` com `AGROCONET_LOAD_DEMO_CATALOG=1` e a conexão explícita à base de demonstração. Esta carga acrescenta categorias, zonas, lojas e produtos sem apagar dados existentes ou criar palavras-passe, sessões, clientes, administradores ou pedidos. Os proprietários das lojas usam endereços reservados `example.invalid` e não têm credenciais de login. Uma nova execução preserva os produtos existentes e o respetivo stock.
 
