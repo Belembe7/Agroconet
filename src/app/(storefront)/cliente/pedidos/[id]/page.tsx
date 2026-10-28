@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getAppSession } from "@/lib/session";
@@ -38,6 +39,7 @@ async function OrderDetailContent({
             include: {
               seller: { select: { businessName: true } },
               items: true,
+              delivery: { select: { id: true } },
             },
           },
           payments: { select: { method: true, status: true } },
@@ -78,6 +80,14 @@ async function OrderDetailContent({
               <PriceTag cents={item.lineTotalCents} />
             </div>
           ))}
+          {group.delivery && (
+            <Link
+              className="section-explore mt-4"
+              href={`/entrega?entrega=${group.delivery.id}`}
+            >
+              Marcar destino e acompanhar entrega
+            </Link>
+          )}
         </section>
       ))}
       <section className="rounded-xl border bg-white p-5">

@@ -3,6 +3,16 @@ import type { PrismaClient } from "@/generated/prisma/client";
 import { displayName } from "@/lib/display-name";
 import { publicImageUrl } from "@/services/catalog/catalog-service";
 
+const LANDING_CATEGORY_ORDER = [
+  "sementes",
+  "cereais",
+  "defensivos",
+  "fertilizantes",
+  "repelente",
+  "medicamentos-veterinarios",
+  "ferramentas",
+];
+
 const contactsSchema = z.object({
   phone: z
     .string()
@@ -44,30 +54,27 @@ export class LandingService {
       where: {
         isActive: true,
         deletedAt: null,
-        products: {
-          some: {
-            status: "ACTIVE",
-            deletedAt: null,
-            seller: {
-              status: "APPROVED",
-              deletedAt: null,
-              user: { status: "ACTIVE", deletedAt: null },
-            },
-            variants: { some: { isActive: true, deletedAt: null } },
-          },
-        },
       },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       take: 24,
       select: { id: true, name: true, slug: true, description: true },
     });
-    return categories.map((category) => ({
-      ...category,
-      name: displayName(category.name),
-      description: category.description
-        ? displayName(category.description)
-        : null,
-    }));
+    const bySlug = new Map(
+      categories.map((category) => [category.slug, category]),
+    );
+    return LANDING_CATEGORY_ORDER.flatMap((slug) => {
+      const category = bySlug.get(slug);
+      if (!category) return [];
+      return [
+        {
+          ...category,
+          name: displayName(category.name),
+          description: category.description
+            ? displayName(category.description)
+            : null,
+        },
+      ];
+    });
   }
   async highlights(query: { q: string; category: string }) {
     const products = await this.db.product.findMany({

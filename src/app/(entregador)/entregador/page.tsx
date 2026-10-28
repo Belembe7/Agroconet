@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
@@ -145,6 +146,12 @@ async function DriverHomeContent() {
                   Ganho desta entrega · {formatPrice(delivery.driverFeeCents)}
                 </p>
               </div>
+              <Link
+                className="text-primary inline-flex min-h-11 items-center text-sm underline"
+                href={`/entrega?entrega=${delivery.id}`}
+              >
+                Ver percurso no mapa
+              </Link>
               {delivery.sellerOrder.seller.latitude &&
                 delivery.sellerOrder.seller.longitude && (
                   <a

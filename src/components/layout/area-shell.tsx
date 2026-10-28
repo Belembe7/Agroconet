@@ -50,6 +50,22 @@ export function AreaShell({
               <Icon aria-hidden="true" className="size-4" />
               {item.label}
             </Link>
+            {area === "admin" && (
+              <>
+                <Link
+                  href="/admin/apoio"
+                  className="flex min-h-11 items-center rounded-lg px-3 text-sm"
+                >
+                  Atendimento aos clientes
+                </Link>
+                <Link
+                  href="/entrega"
+                  className="flex min-h-11 items-center rounded-lg px-3 text-sm"
+                >
+                  Mapa de entregas
+                </Link>
+              </>
+            )}
           </nav>
           <Link
             href="/"
@@ -87,6 +103,14 @@ export function AreaShell({
               <Icon aria-hidden="true" className="size-4" />
               {item.label}
             </Link>
+            {area === "admin" && (
+              <Link
+                href="/admin/apoio"
+                className="ml-6 inline-flex min-h-11 items-center text-sm"
+              >
+                Atendimento
+              </Link>
+            )}
             <Link
               href="/"
               className="ml-6 inline-flex min-h-11 items-center text-sm underline"
@@ -120,6 +144,12 @@ export function AreaShell({
             >
               <Store aria-hidden="true" className="size-5" />
               Loja
+            </Link>
+            <Link
+              href="/entrega"
+              className="flex min-h-14 flex-col items-center justify-center gap-1 text-sm"
+            >
+              Mapa de rotas
             </Link>
           </nav>
         )}

@@ -14,12 +14,16 @@ function accountPath(roles: string[]) {
 
 export async function StorefrontAuthLinks({
   links,
+  locale,
 }: {
   links: NavigationLink[];
+  locale: "pt" | "en";
 }) {
   const session = await getAppSession();
   const destination = session ? accountPath(session.actor.roles) : null;
-  const firstName = session?.user.name.trim().split(/\s+/)[0] || "Conta";
+  const firstName =
+    session?.user.name.trim().split(/\s+/)[0] ||
+    (locale === "en" ? "Account" : "Conta");
   const displayFirstName = `${firstName.slice(0, 1).toLocaleUpperCase("pt-MZ")}${firstName.slice(1)}`;
 
   return (
@@ -30,14 +34,14 @@ export async function StorefrontAuthLinks({
             prefetch={false}
             className="store-login store-account-link"
             href={destination!}
-            aria-label={`Perfil de ${displayFirstName}`}
+            aria-label={`${locale === "en" ? "Profile of" : "Perfil de"} ${displayFirstName}`}
             title={session.user.name}
           >
             <span className="store-account-avatar" aria-hidden="true">
               <UserRound className="size-[18px]" />
             </span>
             <span className="store-account-copy">
-              <span>Olá</span>
+              <span>{locale === "en" ? "Hello" : "Olá"}</span>
               <strong>{displayFirstName}</strong>
             </span>
             <ArrowUpRight
@@ -50,21 +54,26 @@ export async function StorefrontAuthLinks({
       ) : (
         <>
           <Link prefetch={false} className="store-login" href="/entrar">
-            Entrar
+            {locale === "en" ? "Sign in" : "Entrar"}
           </Link>
           <Link
             className="store-register hidden sm:inline-flex"
             href="/registar"
           >
-            Criar conta <ArrowUpRight aria-hidden="true" className="size-4" />
+            {locale === "en" ? "Create account" : "Criar conta"}{" "}
+            <ArrowUpRight aria-hidden="true" className="size-4" />
           </Link>
         </>
       )}
       <details className="mobile-store-menu">
-        <summary aria-label="Menu de navegação">
+        <summary
+          aria-label={locale === "en" ? "Navigation menu" : "Menu de navegação"}
+        >
           <Menu aria-hidden="true" className="size-5" />
         </summary>
-        <nav aria-label="Navegação móvel">
+        <nav
+          aria-label={locale === "en" ? "Mobile navigation" : "Navegação móvel"}
+        >
           {links.map((link) => (
             <Link prefetch={false} key={link.href} href={link.href}>
               {link.label}
@@ -73,11 +82,12 @@ export async function StorefrontAuthLinks({
           {session ? (
             <>
               <Link prefetch={false} href={destination!}>
-                A minha conta · {displayFirstName}
+                {locale === "en" ? "My account" : "A minha conta"} ·{" "}
+                {displayFirstName}
               </Link>
               {session.actor.roles.includes("CUSTOMER") ? (
                 <Link prefetch={false} href="/cliente/pedidos">
-                  Os meus pedidos
+                  {locale === "en" ? "My orders" : "Os meus pedidos"}
                 </Link>
               ) : null}
               <LogoutButton className="mobile-store-logout" />
@@ -85,21 +95,21 @@ export async function StorefrontAuthLinks({
           ) : (
             <>
               <Link prefetch={false} href="/registar">
-                Criar conta
+                {locale === "en" ? "Create account" : "Criar conta"}
               </Link>
               <Link prefetch={false} href="/entrar">
-                Entrar
+                {locale === "en" ? "Sign in" : "Entrar"}
               </Link>
             </>
           )}
           <Link prefetch={false} href="/favoritos">
-            Favoritos
+            {locale === "en" ? "Favorites" : "Favoritos"}
           </Link>
           <Link prefetch={false} href="/carrinho">
-            Carrinho
+            {locale === "en" ? "Cart" : "Carrinho"}
           </Link>
           <Link prefetch={false} href="/#contactos">
-            Contactos
+            {locale === "en" ? "Contact" : "Contactos"}
           </Link>
         </nav>
       </details>

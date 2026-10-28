@@ -16,7 +16,6 @@ Este roteiro publica uma **prévia de avaliação** do estado atual do Agroconet
 | `BETTER_AUTH_SECRET` | Segredo aleatório com pelo menos 32 caracteres, exclusivo deste ambiente |
 | `BETTER_AUTH_URL` | Opcional na Vercel; substitui o endereço de autenticação calculado automaticamente |
 | `NEXT_PUBLIC_APP_URL` | Opcional na Vercel; substitui o endereço público calculado automaticamente, por exemplo para um domínio próprio |
-| `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY` | Chave da Maps Embed API, restrita por HTTP referrer ao domínio da prévia; necessária para mostrar o mapa |
 
 `NODE_ENV` é definido pela plataforma. Em Production, o endereço automático é `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL` (ou o domínio do deploy, se necessário). Em Preview, o sistema usa `NEXT_PUBLIC_VERCEL_URL`, sem apontar a autenticação para produção. As origens de autenticação adicionais são apenas os domínios exatos fornecidos pela Vercel para esse deploy e a sua branch. No desenvolvimento local, continue a definir as URLs de `localhost` no `.env`.
 
@@ -24,11 +23,13 @@ Como `NEXT_PUBLIC_APP_URL` é pública, não coloque segredos em variáveis `NEX
 
 Se o build indicar `Invalid environment variables`, verifique em **Settings → Environment Variables** se as variáveis obrigatórias existem no ambiente do deploy que falhou. Guarde as alterações e publique um novo deploy com o commit mais recente. Não use `SKIP_ENV_VALIDATION` para esconder a falta de configuração.
 
-A política CSP do projeto autoriza o iframe apenas nos domínios do Google Maps usados pela integração. Restrinja também a chave da API ao domínio Preview no Google Cloud.
+O mapa de cobertura usa OpenStreetMap sem chave de API. O planeamento de entregas usa mapas OpenStreetMap e rotas calculadas pelo OSRM. A política CSP permite o mapa incorporado da página de cobertura.
 
 ## Base de dados de prévia
 
-Antes de abrir o link ao cliente, aplique as migrations à base Preview com `npm run db:migrate:deploy`, usando a credencial dessa base. Não execute `db:seed` numa prévia pública: o seed atual inclui contas de desenvolvimento e uma palavra-passe conhecida. Para apresentar o catálogo, carregue apenas dados fictícios e autorizados, sem contas administrativas com credenciais de desenvolvimento.
+Antes de abrir o link ao cliente, aplique as migrations à base Preview com `npm run db:migrate:deploy`, usando a credencial dessa base. As migrations de atendimento e de entrega são necessárias para o chat, os pedidos e as rotas. Não execute `db:seed` numa prévia pública: o seed atual inclui contas de desenvolvimento e uma palavra-passe conhecida.
+
+Para carregar o catálogo fictício de avaliação, use `db:seed:demo` com `AGROCONET_LOAD_DEMO_CATALOG=1` e a conexão explícita à base de demonstração. Esta carga acrescenta categorias, zonas, lojas e produtos sem apagar dados existentes ou criar palavras-passe, sessões, clientes, administradores ou pedidos. Os proprietários das lojas usam endereços reservados `example.invalid` e não têm credenciais de login. Uma nova execução preserva os produtos existentes e o respetivo stock.
 
 Confirme `/api/health`, a página inicial, o catálogo e os detalhes dos produtos. O login só funcionará com a base, o segredo e as URLs corretamente configurados.
 

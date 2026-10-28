@@ -111,7 +111,10 @@ export class DeliveryService {
     assertCan(actor, "delivery:assign");
     const [deliveries, drivers, zones] = await Promise.all([
       this.db.delivery.findMany({
-        where: { status: { in: ["UNASSIGNED", "FAILED"] } },
+        where: {
+          status: { in: ["UNASSIGNED", "FAILED"] },
+          sellerOrder: { status: "READY_FOR_PICKUP" },
+        },
         orderBy: { createdAt: "asc" },
         take: 50,
         select: {
@@ -160,7 +163,7 @@ export class DeliveryService {
       throw new Error("Identificador inválido.");
     const [delivery, driver] = await Promise.all([
       this.db.delivery.findUnique({
-        where: { id: deliveryId },
+        where: { id: deliveryId, sellerOrder: { status: "READY_FOR_PICKUP" } },
         select: { id: true, status: true, zoneId: true, driverId: true },
       }),
       this.db.driver.findFirst({

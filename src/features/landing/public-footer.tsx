@@ -48,15 +48,22 @@ async function ContactDetails() {
   );
 }
 export { ContactDetails };
-export async function FooterAccountLinks() {
+export async function FooterAccountLinks({
+  locale = "pt",
+}: {
+  locale?: "pt" | "en";
+}) {
   const session = await getAppSession();
   if (!session) {
     return (
       <>
         <Link href="/registar">
-          Criar conta <ArrowUpRight aria-hidden="true" className="size-3" />
+          {locale === "en" ? "Create account" : "Criar conta"}{" "}
+          <ArrowUpRight aria-hidden="true" className="size-3" />
         </Link>
-        <Link href="/entrar">Entrar na sua área</Link>
+        <Link href="/entrar">
+          {locale === "en" ? "Sign in" : "Entrar na sua área"}
+        </Link>
       </>
     );
   }
@@ -73,9 +80,13 @@ export async function FooterAccountLinks() {
 
   return (
     <>
-      <Link href={destination}>A minha conta</Link>
+      <Link href={destination}>
+        {locale === "en" ? "My account" : "A minha conta"}
+      </Link>
       {session.actor.roles.includes("CUSTOMER") ? (
-        <Link href="/cliente/pedidos">Os meus pedidos</Link>
+        <Link href="/cliente/pedidos">
+          {locale === "en" ? "My orders" : "Os meus pedidos"}
+        </Link>
       ) : null}
     </>
   );
@@ -84,9 +95,11 @@ export async function FooterAccountLinks() {
 export function FooterContent({
   contacts,
   accountLinks,
+  locale = "pt",
 }: {
   contacts: React.ReactNode;
   accountLinks: React.ReactNode;
+  locale?: "pt" | "en";
 }) {
   return (
     <footer id="contactos" className="landing-footer">
@@ -94,31 +107,57 @@ export function FooterContent({
         <div>
           <Brand />
           <p className="footer-manifesto">
-            Cultivamos ligações.
+            {locale === "en"
+              ? "We cultivate connections."
+              : "Cultivamos ligações."}
             <br />
-            Fazemos crescer possibilidades.
+            {locale === "en"
+              ? "We grow possibilities."
+              : "Fazemos crescer possibilidades."}
           </p>
-          <p className="footer-small">Soluções agropecuárias ao seu alcance.</p>
+          <p className="footer-small">
+            {locale === "en"
+              ? "Agricultural solutions within reach."
+              : "Soluções agropecuárias ao seu alcance."}
+          </p>
         </div>
         <div>
-          <h2>Explore</h2>
-          <Link href="/#categorias">Categorias</Link>
-          <Link href="/#destaques">Produtos em destaque</Link>
-          <Link href="/#como-funciona">Como funciona</Link>
+          <h2>{locale === "en" ? "Explore" : "Explore"}</h2>
+          <Link href="/#categorias">
+            {locale === "en" ? "Categories" : "Categorias"}
+          </Link>
+          <Link href="/#destaques">
+            {locale === "en" ? "Featured products" : "Produtos em destaque"}
+          </Link>
+          <Link href="/#como-funciona">
+            {locale === "en" ? "How it works" : "Como funciona"}
+          </Link>
+          <Link href="/entrega">
+            {locale === "en" ? "Plan delivery" : "Combinar entrega"}
+          </Link>
+          <Link href="/apoio">
+            {locale === "en" ? "Support chat" : "Chat de apoio"}
+          </Link>
         </div>
         <div>
-          <h2>Faça parte</h2>
+          <h2>{locale === "en" ? "Join us" : "Faça parte"}</h2>
           {accountLinks}
-          <Link href="/#vendedores">Para vendedores</Link>
+          <Link href="/#vendedores">
+            {locale === "en" ? "For sellers" : "Para vendedores"}
+          </Link>
         </div>
         <div>
-          <h2>Vamos conversar?</h2>
+          <h2>{locale === "en" ? "Let's talk" : "Vamos conversar?"}</h2>
           {contacts}
         </div>
       </div>
       <div className="footer-bottom">
-        <span>Agroconet · Moçambique</span>
-        <span>Da terra. Com futuro.</span>
+        <span>Agroconet · {locale === "en" ? "Mozambique" : "Moçambique"}</span>
+        <span>
+          {locale === "en"
+            ? "Rooted in the land. Growing for the future."
+            : "Da terra. Com futuro."}
+        </span>
       </div>
     </footer>
   );

@@ -58,6 +58,8 @@ export class OrderService {
             neighborhood: address.neighborhood,
             street: address.street,
             reference: address.reference,
+            latitude: address.latitude?.toString() ?? null,
+            longitude: address.longitude?.toString() ?? null,
           };
           const order = await tx.order.create({
             data: {
@@ -101,7 +103,16 @@ export class OrderService {
           for (const group of groups) {
             const seller = await tx.seller.findUnique({
               where: { id: group.sellerId },
-              select: { commissionBpsOverride: true },
+              select: {
+                commissionBpsOverride: true,
+                businessName: true,
+                phone: true,
+                addressText: true,
+                latitude: true,
+                longitude: true,
+                province: true,
+                district: true,
+              },
             });
             const commissionBps = seller?.commissionBpsOverride ?? 0;
             const commissionCents = Math.round(
@@ -115,6 +126,23 @@ export class OrderService {
                 deliveryFeeCents: 0,
                 commissionCents,
                 sellerNetCents: group.subtotalCents - commissionCents,
+                delivery: {
+                  create: {
+                    pickupAddressSnapshot: {
+                      businessName: seller?.businessName ?? "",
+                      phone: seller?.phone ?? "",
+                      reference: seller?.addressText ?? "",
+                      province: seller?.province ?? "",
+                      district: seller?.district ?? "",
+                      latitude: seller?.latitude?.toString() ?? null,
+                      longitude: seller?.longitude?.toString() ?? null,
+                    },
+                    dropoffAddressSnapshot: addressSnapshot,
+                    zoneId: address.zoneId,
+                    feeCents: 0,
+                    driverFeeCents: 0,
+                  },
+                },
                 items: {
                   create: group.items.map((item) => ({
                     variantId: item.variantId,

@@ -14,12 +14,13 @@ import {
 } from "@/features/landing/data";
 import { normalizeLandingQuery } from "@/services/catalog/landing-service";
 import { PriceTag } from "@/components/shared/price-tag";
-import { categoryImagePosition } from "@/lib/category-image";
+import { categoryImagePosition, categoryImageUrl } from "@/lib/category-image";
 import { productImageUrl } from "@/lib/product-image";
 import { getCatalogUnavailableDescription } from "@/features/catalog/messages";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { localizeCategory, type SiteLocale } from "@/lib/locale";
 
 export type LandingSearchParams = Promise<{
   q?: string | string[];
@@ -35,7 +36,7 @@ export function CatalogLoading() {
     </div>
   );
 }
-export async function LandingCategories() {
+export async function LandingCategories({ locale }: { locale: SiteLocale }) {
   await connection();
   let categories;
   try {
@@ -43,16 +44,32 @@ export async function LandingCategories() {
   } catch {
     return (
       <ErrorState
-        title="Categorias temporariamente indisponíveis"
-        description={getCatalogUnavailableDescription()}
+        title={
+          locale === "en"
+            ? "Categories are temporarily unavailable"
+            : "Categorias temporariamente indisponíveis"
+        }
+        description={
+          locale === "en"
+            ? "Please try again in a moment."
+            : getCatalogUnavailableDescription()
+        }
       />
     );
   }
   if (!categories.length)
     return (
       <EmptyState
-        title="Novas possibilidades a caminho"
-        description="Estamos a preparar as categorias para o seu campo."
+        title={
+          locale === "en"
+            ? "New possibilities are on the way"
+            : "Novas possibilidades a caminho"
+        }
+        description={
+          locale === "en"
+            ? "We are preparing categories for your farm."
+            : "Estamos a preparar as categorias para o seu campo."
+        }
       />
     );
   return (
@@ -61,6 +78,7 @@ export async function LandingCategories() {
         const imagePosition = categoryImagePosition(
           `${category.name} ${category.description ?? ""}`,
         );
+        const imageUrl = categoryImageUrl(category.name);
 
         return (
           <Link
@@ -69,11 +87,21 @@ export async function LandingCategories() {
             key={category.id}
             style={{ animationDelay: `${index * 70}ms` }}
           >
-            {imagePosition && (
+            {(imagePosition || imageUrl) && (
               <span
                 aria-hidden="true"
                 className="landing-category-art"
-                style={{ backgroundPosition: imagePosition }}
+                style={{
+                  backgroundPosition: imageUrl
+                    ? "center"
+                    : (imagePosition ?? undefined),
+                  ...(imageUrl
+                    ? {
+                        backgroundImage: `url('${imageUrl}')`,
+                        backgroundSize: "cover",
+                      }
+                    : {}),
+                }}
               />
             )}
             <span className="landing-category-content">
@@ -81,10 +109,11 @@ export async function LandingCategories() {
                 <Sprout aria-hidden="true" className="size-6" />
                 <span>{String(index + 1).padStart(2, "0")}</span>
               </span>
-              <h3>{category.name}</h3>
+              <h3>{localizeCategory(category.name, locale)}</h3>
               {category.description && <p>{category.description}</p>}
               <span className="category-link-label">
-                Explorar <ArrowUpRight aria-hidden="true" className="size-4" />
+                {locale === "en" ? "Explore" : "Explorar"}{" "}
+                <ArrowUpRight aria-hidden="true" className="size-4" />
               </span>
             </span>
           </Link>
@@ -95,9 +124,12 @@ export async function LandingCategories() {
 }
 export async function LandingHighlights({
   searchParams,
+  locale,
 }: {
   searchParams: LandingSearchParams;
+  locale: SiteLocale;
 }) {
+  const english = locale === "en";
   await connection();
   const query = normalizeLandingQuery(await searchParams);
   let products;
@@ -106,11 +138,19 @@ export async function LandingHighlights({
   } catch {
     return (
       <ErrorState
-        title="Não foi possível carregar os produtos"
-        description={getCatalogUnavailableDescription()}
+        title={
+          english
+            ? "Could not load products"
+            : "Não foi possível carregar os produtos"
+        }
+        description={
+          english
+            ? "Please try again in a moment."
+            : getCatalogUnavailableDescription()
+        }
         action={
           <Link href="/produtos" className="creative-button">
-            Tentar novamente{" "}
+            {english ? "Try again" : "Tentar novamente"}{" "}
             <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         }
@@ -122,14 +162,20 @@ export async function LandingHighlights({
       <div className="catalog-results-bar">
         <p>
           {query.q
-            ? `Resultados para “${query.q}”`
+            ? english
+              ? `Results for “${query.q}”`
+              : `Resultados para “${query.q}”`
             : query.category
-              ? "Produtos da categoria seleccionada"
-              : "Uma selecção dos produtos publicados mais recentemente."}
+              ? english
+                ? "Products in the selected category"
+                : "Produtos da categoria seleccionada"
+              : english
+                ? "A selection of the most recently published products."
+                : "Uma selecção dos produtos publicados mais recentemente."}
         </p>
         {(query.q || query.category) && (
           <Link href="/produtos">
-            Limpar pesquisa{" "}
+            {english ? "Clear search" : "Limpar pesquisa"}{" "}
             <ArrowUpRight aria-hidden="true" className="size-4" />
           </Link>
         )}
@@ -138,42 +184,55 @@ export async function LandingHighlights({
         action="/produtos"
         className="catalog-search"
         role="search"
-        aria-label="Pesquisar nos destaques"
+        aria-label={english ? "Search highlights" : "Pesquisar nos destaques"}
       >
         <Search aria-hidden="true" className="size-5" />
         <label htmlFor="catalog-search" className="sr-only">
-          Produto ou marca
+          {english ? "Product or brand" : "Produto ou marca"}
         </label>
         <input
           id="catalog-search"
           name="q"
           maxLength={100}
           defaultValue={query.q}
-          placeholder="Procure por produto ou marca…"
+          placeholder={
+            english
+              ? "Search by product or brand…"
+              : "Procure por produto ou marca…"
+          }
         />
         {query.category && (
           <input type="hidden" name="categoria" value={query.category} />
         )}
         <button type="submit">
-          Pesquisar <ArrowRight aria-hidden="true" className="size-4" />
+          {english ? "Search" : "Pesquisar"}{" "}
+          <ArrowRight aria-hidden="true" className="size-4" />
         </button>
       </form>
       {!products.length ? (
         <EmptyState
           title={
             query.q || query.category
-              ? "Não encontrámos produtos"
-              : "Estamos a preparar a montra"
+              ? english
+                ? "No products found"
+                : "Não encontrámos produtos"
+              : english
+                ? "We are preparing the marketplace"
+                : "Estamos a preparar a montra"
           }
           description={
             query.q || query.category
-              ? "Experimente outro nome, marca ou categoria."
-              : "Os produtos publicados aparecerão aqui em breve."
+              ? english
+                ? "Try another name, brand or category."
+                : "Experimente outro nome, marca ou categoria."
+              : english
+                ? "Published products will appear here soon."
+                : "Os produtos publicados aparecerão aqui em breve."
           }
           action={
             (query.q || query.category) && (
               <Link href="/produtos" className="creative-button">
-                Ver destaques
+                {english ? "View highlights" : "Ver destaques"}
               </Link>
             )
           }
@@ -239,7 +298,13 @@ export async function LandingHighlights({
                           : "stock-label stock-empty"
                       }
                     >
-                      {product.available ? "Em stock" : "Sem stock nesta opção"}
+                      {product.available
+                        ? english
+                          ? "In stock"
+                          : "Em stock"
+                        : english
+                          ? "Out of stock"
+                          : "Sem stock nesta opção"}
                     </span>
                   </div>
                   <div className="product-copy">
@@ -251,7 +316,7 @@ export async function LandingHighlights({
                     </p>
                     <p className="product-seller">Por {product.seller}</p>
                     <div className="product-price">
-                      <span>A partir de</span>
+                      <span>{english ? "From" : "A partir de"}</span>
                       <PriceTag cents={product.priceCents} />
                     </div>
                   </div>
@@ -262,9 +327,9 @@ export async function LandingHighlights({
         </div>
       )}
       <p className="catalog-footnote">
-        Até 8 destaques por pesquisa. Preços e disponibilidade sujeitos a
-        confirmação. Para esclarecer dúvidas, fale connosco nos contactos
-        abaixo.
+        {english
+          ? "Up to 8 highlights per search. Prices and availability are subject to confirmation. Contact us below if you have any questions."
+          : "Até 8 destaques por pesquisa. Preços e disponibilidade sujeitos a confirmação. Para esclarecer dúvidas, fale connosco nos contactos abaixo."}
       </p>
     </>
   );

@@ -51,6 +51,7 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
             <span>Fotografia em breve</span>
           </>
         )}
+        <span className="catalog-image-category">{product.category}</span>
         <span
           className={
             product.available ? "catalog-stock" : "catalog-stock is-empty"
@@ -61,7 +62,6 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
       </div>
       <div className="catalog-product-copy">
         <div className="flex items-center justify-between gap-2">
-          <p className="catalog-product-category">{product.category}</p>
           {product.ratingCount > 0 ? (
             <span className="catalog-rating">
               <Star aria-hidden="true" className="size-3.5 fill-current" />
