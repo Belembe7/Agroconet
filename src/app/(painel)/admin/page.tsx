@@ -18,8 +18,10 @@ import {
   createZoneAction,
 } from "@/features/delivery/actions";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { ActionFeedbackForm } from "@/components/shared/action-feedback-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 
 export default function AdminHomePage() {
   return (
@@ -87,24 +89,34 @@ async function AdminHomeContent() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <form action={reviewSellerAction}>
+                    <ActionFeedbackForm
+                      action={reviewSellerAction}
+                      successMessage="Vendedor aprovado."
+                      errorMessage="Não foi possível aprovar o vendedor. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="id" value={seller.id} />
                       <input type="hidden" name="decision" value="approve" />
                       <Button size="sm">Aprovar</Button>
-                    </form>
-                    <form action={reviewSellerAction} className="flex gap-2">
+                    </ActionFeedbackForm>
+                    <ActionFeedbackForm
+                      action={reviewSellerAction}
+                      className="flex gap-2"
+                      successMessage="Decisão sobre o vendedor guardada."
+                      errorMessage="Não foi possível rejeitar o vendedor. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="id" value={seller.id} />
                       <input type="hidden" name="decision" value="reject" />
                       <Input
                         name="reason"
                         placeholder="Motivo"
+                        maxLength={500}
                         aria-label="Motivo da rejeição"
                         className="w-28"
                       />
                       <Button size="sm" variant="destructive">
                         Rejeitar
                       </Button>
-                    </form>
+                    </ActionFeedbackForm>
                   </div>
                 </li>
               ))}
@@ -134,24 +146,34 @@ async function AdminHomeContent() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <form action={reviewProductAction}>
+                    <ActionFeedbackForm
+                      action={reviewProductAction}
+                      successMessage="Produto aprovado."
+                      errorMessage="Não foi possível aprovar o produto. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="id" value={product.id} />
                       <input type="hidden" name="decision" value="approve" />
                       <Button size="sm">Aprovar</Button>
-                    </form>
-                    <form action={reviewProductAction} className="flex gap-2">
+                    </ActionFeedbackForm>
+                    <ActionFeedbackForm
+                      action={reviewProductAction}
+                      className="flex gap-2"
+                      successMessage="Decisão sobre o produto guardada."
+                      errorMessage="Não foi possível rejeitar o produto. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="id" value={product.id} />
                       <input type="hidden" name="decision" value="reject" />
                       <Input
                         name="reason"
                         placeholder="Motivo"
+                        maxLength={500}
                         aria-label="Motivo da rejeição"
                         className="w-28"
                       />
                       <Button size="sm" variant="destructive">
                         Rejeitar
                       </Button>
-                    </form>
+                    </ActionFeedbackForm>
                   </div>
                 </li>
               ))}
@@ -182,7 +204,12 @@ async function AdminHomeContent() {
                   <p className="text-muted-foreground text-sm">
                     Tentativa {delivery.attempts + 1}
                   </p>
-                  <form action={assignDeliveryAction} className="flex gap-2">
+                  <ActionFeedbackForm
+                    action={assignDeliveryAction}
+                    className="flex flex-wrap gap-2"
+                    successMessage="Entrega atribuída ao entregador."
+                    errorMessage="Não foi possível atribuir a entrega. Verifique a disponibilidade e tente novamente."
+                  >
                     <input
                       type="hidden"
                       name="deliveryId"
@@ -211,7 +238,7 @@ async function AdminHomeContent() {
                         ))}
                     </select>
                     <Button size="sm">Atribuir</Button>
-                  </form>
+                  </ActionFeedbackForm>
                 </li>
               ))}
             </ul>
@@ -223,7 +250,12 @@ async function AdminHomeContent() {
         </section>
         <section className="bg-card space-y-4 rounded-2xl border p-5">
           <h2 className="text-lg font-semibold">Criar zona de entrega</h2>
-          <form action={createZoneAction} className="grid gap-3 sm:grid-cols-2">
+          <ActionFeedbackForm
+            action={createZoneAction}
+            className="grid gap-3 sm:grid-cols-2"
+            successMessage="Zona de entrega criada."
+            errorMessage="Não foi possível criar a zona. Verifique os dados e tente novamente."
+          >
             <Input
               name="name"
               placeholder="Nome da zona"
@@ -244,18 +276,12 @@ async function AdminHomeContent() {
             />
             <label className="text-muted-foreground text-sm">
               Taxa base (Mzn)
-              <Input
-                name="baseFeeMzn"
-                type="number"
-                min="0"
-                step="0.01"
-                required
-              />
+              <NumericInput name="baseFeeMzn" min="0" step="0.01" required />
             </label>
             <div className="flex items-end">
               <Button>Criar zona</Button>
             </div>
-          </form>
+          </ActionFeedbackForm>
         </section>
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
@@ -329,10 +355,14 @@ async function AdminHomeContent() {
                     {driver.status}
                   </StatusBadge>
                   {driver.status === "PENDING" && (
-                    <form action={approveDriverAction}>
+                    <ActionFeedbackForm
+                      action={approveDriverAction}
+                      successMessage="Entregador aprovado."
+                      errorMessage="Não foi possível aprovar o entregador. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="id" value={driver.id} />
                       <Button size="sm">Aprovar</Button>
-                    </form>
+                    </ActionFeedbackForm>
                   )}
                 </div>
               </li>
@@ -351,7 +381,12 @@ async function AdminHomeContent() {
             Criar e activar/desactivar categorias.
           </p>
         </div>
-        <form action={createCategoryAction} className="flex flex-wrap gap-2">
+        <ActionFeedbackForm
+          action={createCategoryAction}
+          className="flex flex-wrap gap-2"
+          successMessage="Categoria criada."
+          errorMessage="Não foi possível criar a categoria. Verifique os campos e tente novamente."
+        >
           <Input
             name="name"
             placeholder="Nova categoria"
@@ -363,10 +398,11 @@ async function AdminHomeContent() {
           <Input
             name="description"
             placeholder="Descrição (opcional)"
+            maxLength={500}
             className="min-w-48 flex-1"
           />
           <Button>Criar categoria</Button>
-        </form>
+        </ActionFeedbackForm>
         <ul className="grid gap-2 sm:grid-cols-2">
           {operations.categories.map((category) => (
             <li
@@ -381,7 +417,11 @@ async function AdminHomeContent() {
                     : "Revisão normal"}
                 </p>
               </div>
-              <form action={setCategoryActiveAction}>
+              <ActionFeedbackForm
+                action={setCategoryActiveAction}
+                successMessage="Estado da categoria atualizado."
+                errorMessage="Não foi possível atualizar a categoria. Atualize o painel e tente novamente."
+              >
                 <input type="hidden" name="id" value={category.id} />
                 <input
                   type="hidden"
@@ -391,7 +431,7 @@ async function AdminHomeContent() {
                 <Button size="sm" variant="outline">
                   {category.isActive ? "Desactivar" : "Activar"}
                 </Button>
-              </form>
+              </ActionFeedbackForm>
             </li>
           ))}
         </ul>

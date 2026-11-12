@@ -19,9 +19,8 @@ export function LanguageSwitcher({ locale }: { locale: "pt" | "en" }) {
 
   return (
     <label className="storefront-language">
-      <span className="sr-only">Language / Idioma</span>
       <select
-        aria-label="Language / Idioma"
+        aria-label={locale === "en" ? "Change language" : "Alterar idioma"}
         value={locale}
         onChange={(event) => changeLanguage(event.target.value)}
       >

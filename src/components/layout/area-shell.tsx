@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { LayoutDashboard, Store, Truck, UserRound } from "lucide-react";
 import { Brand } from "@/components/layout/brand";
+import { AreaBackButton } from "@/components/layout/area-back-button";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { displayName } from "@/lib/display-name";
 
@@ -28,7 +29,7 @@ export function AreaShell({
   const Icon = item.icon;
   const panel = area === "admin" || area === "vendedor";
   return (
-    <div className="bg-background flex min-h-screen flex-1">
+    <div className="area-shell bg-background flex min-h-screen flex-1">
       <a
         href="#area-conteudo"
         className="focus:bg-card sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:p-4"
@@ -78,9 +79,19 @@ export function AreaShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="bg-card border-b px-4 py-4 sm:px-8">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-            <div>
-              <p className="font-heading text-xl font-semibold">{title}</p>
-              <p className="text-muted-foreground text-sm">{subtitle}</p>
+            <div className="flex min-w-0 items-center gap-3">
+              <AreaBackButton
+                areaHomeHref={item.href}
+                returnLabel={
+                  area === "cliente"
+                    ? "Voltar à minha conta"
+                    : "Voltar ao painel"
+                }
+              />
+              <div className="min-w-0">
+                <p className="font-heading text-xl font-semibold">{title}</p>
+                <p className="text-muted-foreground text-sm">{subtitle}</p>
+              </div>
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <span className="hidden max-w-48 truncate text-sm sm:inline">

@@ -93,6 +93,7 @@ export type CatalogProductCard = {
   category: string;
   categorySlug: string;
   seller: string;
+  estimated: boolean;
   label: string;
   priceCents: number;
   available: boolean;
@@ -146,6 +147,7 @@ type ProductWithCardFields = Prisma.ProductGetPayload<{
     slug: true;
     name: true;
     brand: true;
+    description: true;
     ratingAvg: true;
     ratingCount: true;
     category: { select: { name: true; slug: true } };
@@ -179,6 +181,7 @@ function toCard(product: ProductWithCardFields): CatalogProductCard | null {
     category: displayName(product.category.name),
     categorySlug: product.category.slug,
     seller: displayName(product.seller.businessName),
+    estimated: product.description?.startsWith("Dados estimados:") ?? false,
     label: displayName(variant.label),
     priceCents: variant.priceCents,
     available: product.variants.some(
@@ -408,6 +411,7 @@ const productCardSelect = {
   slug: true,
   name: true,
   brand: true,
+  description: true,
   ratingAvg: true,
   ratingCount: true,
   category: { select: { name: true, slug: true } },

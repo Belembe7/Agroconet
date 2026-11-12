@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
-import { saveAddressAction } from "@/features/customer/actions";
+import { AddressForm } from "@/features/customer/address-form";
 import { displayName } from "@/lib/display-name";
 
 export default function CustomerAddressesPage() {
@@ -49,43 +49,7 @@ async function CustomerAddressesContent() {
           </article>
         ))}
       </div>
-      <form
-        action={saveAddressAction}
-        className="grid gap-4 rounded-2xl border bg-white p-5 sm:grid-cols-2"
-      >
-        <h3 className="text-xl font-semibold sm:col-span-2">
-          Adicionar morada
-        </h3>
-        {[
-          ["label", "Nome da morada"],
-          ["recipientName", "Destinatário"],
-          ["phone", "Telefone"],
-          ["province", "Província"],
-          ["district", "Distrito"],
-          ["neighborhood", "Bairro / localidade"],
-          ["street", "Rua (opcional)"],
-          ["reference", "Ponto de referência"],
-        ].map(([name, label]) => (
-          <label className="grid gap-1 text-sm" key={name}>
-            {label}
-            <input
-              className="rounded-lg border px-3"
-              name={name}
-              required={name !== "street"}
-            />
-          </label>
-        ))}
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="isDefault" />
-          Definir como principal
-        </label>
-        <button
-          className="bg-primary rounded-full px-5 py-3 font-semibold sm:col-span-2"
-          type="submit"
-        >
-          Guardar morada
-        </button>
-      </form>
+      <AddressForm />
     </section>
   );
 }

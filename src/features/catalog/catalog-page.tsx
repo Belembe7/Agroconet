@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Search, SlidersHorizontal } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { formatPrice } from "@/lib/format";
 import { getCatalogCategories, getCatalogPage } from "@/features/catalog/data";
 import { getCatalogUnavailableDescription } from "@/features/catalog/messages";
@@ -85,9 +86,8 @@ export async function CatalogFilters({
       </label>
       <label className="catalog-filter-field">
         <span>Preço mínimo (MT)</span>
-        <input
+        <NumericInput
           name="minimo"
-          type="number"
           min="0"
           max="1000000"
           step="0.01"
@@ -100,9 +100,8 @@ export async function CatalogFilters({
       </label>
       <label className="catalog-filter-field">
         <span>Preço máximo (MT)</span>
-        <input
+        <NumericInput
           name="maximo"
-          type="number"
           min="0"
           max="1000000"
           step="0.01"

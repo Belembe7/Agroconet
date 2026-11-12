@@ -139,10 +139,14 @@ export class SellerService {
       name.length < 3 ||
       name.length > 120 ||
       !label ||
+      label.length > 120 ||
       !sku ||
+      sku.length > 80 ||
       !uuid.test(input.categoryId)
     )
       throw new Error("Preencha os campos obrigatórios do produto.");
+    if (input.brand.length > 100 || input.description.length > 2000)
+      throw new Error("Marca ou descrição excede o limite permitido.");
     if (
       !Number.isSafeInteger(input.priceCents) ||
       input.priceCents < 1 ||
@@ -281,6 +285,9 @@ export class SellerService {
       name.length < 3 ||
       name.length > 120 ||
       !input.label.trim() ||
+      input.label.trim().length > 120 ||
+      input.brand.length > 100 ||
+      input.description.length > 2000 ||
       !Number.isSafeInteger(input.priceCents) ||
       input.priceCents < 1
     )
@@ -341,8 +348,10 @@ export class SellerService {
     if (
       businessName.length < 2 ||
       businessName.length > 160 ||
+      input.legalName.length > 160 ||
       phone.length < 7 ||
       phone.length > 32 ||
+      input.description.length > 2000 ||
       !input.province.trim() ||
       !input.district.trim() ||
       !input.addressText.trim()

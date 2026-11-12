@@ -411,19 +411,22 @@ export class DeliveryService {
     },
   ) {
     assertCan(actor, "driver:manage");
+    const name = input.name.trim();
+    const province = input.province.trim();
+    const areas = input.areas.map((area) => area.trim()).filter(Boolean);
     if (
-      input.name.length < 2 ||
-      input.province.length < 2 ||
-      input.areas.length === 0 ||
+      name.length < 2 ||
+      province.length < 2 ||
+      areas.length === 0 ||
       !Number.isSafeInteger(input.baseFeeCents) ||
       input.baseFeeCents < 0
     )
       throw new Error("Dados de zona inválidos.");
     return this.db.deliveryZone.create({
       data: {
-        name: input.name.trim(),
-        province: input.province.trim(),
-        areas: input.areas.map((area) => area.trim()).filter(Boolean),
+        name,
+        province,
+        areas,
         baseFeeCents: input.baseFeeCents,
       },
     });

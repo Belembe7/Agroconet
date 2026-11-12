@@ -214,6 +214,7 @@ export class AdminService {
   async approveDriver(actor: Actor, id: string) {
     const audit = this.authorize(actor);
     assertCan(actor, "driver:manage");
+    if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("Entregador inválido.");
     const driver = await this.db.driver.findFirst({
       where: { id, deletedAt: null },
       select: { id: true, status: true },

@@ -174,35 +174,54 @@ export function ConfidenceSection({ locale }: { locale: SiteLocale }) {
   const english = locale === "en";
   return (
     <section
-      className="confidence-section"
+      className="confidence-section agro-confidence"
       aria-label={english ? "Agroconet commitments" : "Compromissos Agroconet"}
     >
-      <div>
-        <ShieldCheck aria-hidden="true" />
-        <h3>{english ? "Approved sellers" : "Vendedores aprovados"}</h3>
+      <div className="agro-confidence-heading">
+        <p className="guide-eyebrow">
+          {english ? "A CLEAR WAY TO MOVE FORWARD" : "UM CAMINHO MAIS CLARO"}
+        </p>
+        <h2>
+          {english ? "Good choices start with" : "Boas escolhas começam com"}
+          <br />
+          <span className="editorial-accent">
+            {english ? "clear information." : "informação clara."}
+          </span>
+        </h2>
         <p>
           {english
-            ? "Only products from approved sellers appear in our marketplace."
-            : "Apenas produtos publicados por vendedores aprovados aparecem na nossa montra."}
+            ? "See the details, confirm what is available and contact our team whenever you need help."
+            : "Consulte os detalhes, confirme o que está disponível e fale com a nossa equipa sempre que precisar."}
         </p>
       </div>
-      <div>
-        <Wallet aria-hidden="true" />
-        <h3>{english ? "Clear pricing" : "Preços claros"}</h3>
-        <p>
-          {english
-            ? "Review each option's price. Confirm the total and delivery before buying."
-            : "Consulte o valor de cada opção. Confirme o total e a entrega antes de comprar."}
-        </p>
-      </div>
-      <div>
-        <Leaf aria-hidden="true" />
-        <h3>{english ? "Helpful support" : "Apoio próximo"}</h3>
-        <p>
-          {english
-            ? "Our team can answer questions and help you find what works for you."
-            : "Uma equipa para esclarecer dúvidas e ajudar a encontrar o que faz sentido para si."}
-        </p>
+      <div className="agro-confidence-grid">
+        <article>
+          <ShieldCheck aria-hidden="true" />
+          <h3>{english ? "Approved sellers" : "Vendedores aprovados"}</h3>
+          <p>
+            {english
+              ? "Only products from approved sellers appear in our marketplace."
+              : "Apenas produtos publicados por vendedores aprovados aparecem na nossa montra."}
+          </p>
+        </article>
+        <article>
+          <Wallet aria-hidden="true" />
+          <h3>{english ? "Clear pricing" : "Preços claros"}</h3>
+          <p>
+            {english
+              ? "Review each option's price. Confirm the total and delivery before buying."
+              : "Consulte o valor de cada opção. Confirme o total e a entrega antes de comprar."}
+          </p>
+        </article>
+        <article>
+          <Leaf aria-hidden="true" />
+          <h3>{english ? "Helpful support" : "Apoio próximo"}</h3>
+          <p>
+            {english
+              ? "Our team can answer questions and help you find what works for you."
+              : "Uma equipa para esclarecer dúvidas e ajudar a encontrar o que faz sentido para si."}
+          </p>
+        </article>
       </div>
     </section>
   );

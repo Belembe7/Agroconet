@@ -1,13 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { connection } from "next/server";
-import {
-  ArrowUpRight,
-  Package,
-  Sprout,
-  ArrowRight,
-  Search,
-} from "lucide-react";
+import { ArrowUpRight, Package, Sprout, ArrowRight } from "lucide-react";
 import {
   getLandingCategories,
   getLandingHighlights,
@@ -181,35 +175,6 @@ export async function LandingHighlights({
           </Link>
         )}
       </div>
-      <form
-        action="/produtos"
-        className="catalog-search"
-        role="search"
-        aria-label={english ? "Search highlights" : "Pesquisar nos destaques"}
-      >
-        <Search aria-hidden="true" className="size-5" />
-        <label htmlFor="catalog-search" className="sr-only">
-          {english ? "Product or brand" : "Produto ou marca"}
-        </label>
-        <input
-          id="catalog-search"
-          name="q"
-          maxLength={100}
-          defaultValue={query.q}
-          placeholder={
-            english
-              ? "Search by product or brand…"
-              : "Procure por produto ou marca…"
-          }
-        />
-        {query.category && (
-          <input type="hidden" name="categoria" value={query.category} />
-        )}
-        <button type="submit">
-          {english ? "Search" : "Pesquisar"}{" "}
-          <ArrowRight aria-hidden="true" className="size-4" />
-        </button>
-      </form>
       {!products.length ? (
         <EmptyState
           title={
@@ -250,7 +215,13 @@ export async function LandingHighlights({
                 key={product.id}
               >
                 <article className="landing-product">
-                  <div className="product-visual">
+                  <div
+                    className={
+                      product.estimated
+                        ? "product-visual product-visual-packaging"
+                        : "product-visual"
+                    }
+                  >
                     {product.imageUrl ? (
                       <Image
                         src={product.imageUrl}
@@ -258,7 +229,11 @@ export async function LandingHighlights({
                         fill
                         sizes="(max-width: 760px) 50vw, 25vw"
                         unoptimized={/^https?:\/\//.test(product.imageUrl)}
-                        className="object-cover"
+                        className={
+                          product.estimated
+                            ? "product-packaging-photo object-contain"
+                            : "object-cover"
+                        }
                       />
                     ) : productFallbackImage ? (
                       <ProductFallbackPhoto
@@ -300,7 +275,13 @@ export async function LandingHighlights({
                       {product.label}
                       {product.brand ? ` · ${product.brand}` : ""}
                     </p>
-                    <p className="product-seller">Por {product.seller}</p>
+                    <p className="product-seller">
+                      {product.estimated
+                        ? english
+                          ? "Seller to be confirmed"
+                          : "Fornecedor por confirmar"
+                        : `${english ? "By" : "Por"} ${product.seller}`}
+                    </p>
                     <div className="product-price">
                       <span>{english ? "From" : "A partir de"}</span>
                       <PriceTag cents={product.priceCents} />
@@ -313,9 +294,13 @@ export async function LandingHighlights({
         </div>
       )}
       <p className="catalog-footnote">
-        {english
-          ? "Up to 8 highlights per search. Prices and availability are subject to confirmation. Contact us below if you have any questions."
-          : "Até 8 destaques por pesquisa. Preços e disponibilidade sujeitos a confirmação. Para esclarecer dúvidas, fale connosco nos contactos abaixo."}
+        {products.some((product) => product.estimated)
+          ? english
+            ? "These seed highlights use estimated prices, package sizes and stock. Sellers are still to be confirmed; contact us before ordering."
+            : "Estes destaques de sementes têm preços, embalagens e stock estimados. Os fornecedores estão por confirmar; contacte-nos antes de encomendar."
+          : english
+            ? "Up to 8 highlights per search. Prices and availability are subject to confirmation. Contact us below if you have any questions."
+            : "Até 8 destaques por pesquisa. Preços e disponibilidade sujeitos a confirmação. Para esclarecer dúvidas, fale connosco nos contactos abaixo."}
       </p>
     </>
   );

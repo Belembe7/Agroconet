@@ -57,20 +57,29 @@ export function RegisterForm() {
       <AuthField
         label="Nome"
         value={name}
-        onChange={setName}
+        onChange={(value) => {
+          setName(value);
+          setError(null);
+        }}
         autoComplete="name"
       />
       <AuthField
         label="Email para notificações"
         value={email}
-        onChange={setEmail}
+        onChange={(value) => {
+          setEmail(value);
+          setError(null);
+        }}
         type="email"
         autoComplete="email"
       />
       <AuthField
         label="Palavra-passe"
         value={password}
-        onChange={setPassword}
+        onChange={(value) => {
+          setPassword(value);
+          setError(null);
+        }}
         type="password"
         autoComplete="new-password"
         minLength={8}
@@ -78,12 +87,19 @@ export function RegisterForm() {
       <AuthField
         label="Confirmar palavra-passe"
         value={confirm}
-        onChange={setConfirm}
+        onChange={(value) => {
+          setConfirm(value);
+          setError(null);
+        }}
         type="password"
         autoComplete="new-password"
         minLength={8}
       />
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-red-700">
+          {error}
+        </p>
+      ) : null}
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "A criar conta…" : "Criar conta"}
       </Button>

@@ -53,6 +53,8 @@ export function SupportChat({
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [activity, setActivity] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
   const refreshList = useCallback(async () => {
     const data = await browserApi<{ tickets: Ticket[] }>("/api/apoio");
@@ -116,6 +118,8 @@ export function SupportChat({
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
+    setActivity(en ? "Sending message…" : "A enviar mensagem…");
     setBusy(true);
     try {
       const result = await browserApi<{ id: string }>("/api/apoio", {
@@ -129,28 +133,60 @@ export function SupportChat({
       setBody("");
       setSubject("");
       setSelectedId(result.id);
-      setThread(await browserApi<Thread>(`/api/apoio?ticketId=${result.id}`));
-      await refreshList();
+      setNotice(
+        en ? "Your message has been sent." : "A sua mensagem foi enviada.",
+      );
+      try {
+        setThread(await browserApi<Thread>(`/api/apoio?ticketId=${result.id}`));
+        await refreshList();
+      } catch {
+        setError(
+          en
+            ? "Your message was sent, but the conversation could not refresh. Reload the page to see it."
+            : "A mensagem foi enviada, mas não consegui atualizar a conversa. Atualize a página para a ver.",
+        );
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setActivity("");
     }
   }
   async function statusChange(status: string) {
     setBusy(true);
     setError("");
+    setNotice("");
+    setActivity(
+      en
+        ? "Updating conversation status…"
+        : "A atualizar o estado da conversa…",
+    );
     try {
       await browserApi("/api/apoio", {
         method: "PATCH",
         body: JSON.stringify({ ticketId: selectedId, status }),
       });
-      setThread(await browserApi<Thread>(`/api/apoio?ticketId=${selectedId}`));
-      await refreshList();
+      setNotice(
+        en ? "Conversation status updated." : "Estado da conversa atualizado.",
+      );
+      try {
+        setThread(
+          await browserApi<Thread>(`/api/apoio?ticketId=${selectedId}`),
+        );
+        await refreshList();
+      } catch {
+        setError(
+          en
+            ? "The status changed, but the conversation could not refresh. Reload the page to see it."
+            : "O estado foi alterado, mas não consegui atualizar a conversa. Atualize a página para o ver.",
+        );
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setActivity("");
     }
   }
   function select(id: string | null) {
@@ -158,6 +194,8 @@ export function SupportChat({
     setThread(null);
     setBody("");
     setError("");
+    setNotice("");
+    setActivity("");
   }
 
   return (
@@ -261,6 +299,16 @@ export function SupportChat({
             {error}
           </p>
         )}
+        {notice && (
+          <p role="status" aria-live="polite" className="service-notice">
+            {notice}
+          </p>
+        )}
+        {activity && (
+          <p role="status" aria-live="polite" className="sr-only">
+            {activity}
+          </p>
+        )}
         {admin && thread && (
           <div className="support-admin-status">
             <label htmlFor="support-status">Estado da inquietação</label>
@@ -333,6 +381,7 @@ export function SupportChat({
                 <input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
+                  disabled={busy}
                   minLength={3}
                   maxLength={160}
                   required
@@ -357,6 +406,7 @@ export function SupportChat({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               maxLength={4000}
+              aria-describedby="support-body-counter"
               required
               rows={3}
               placeholder={
@@ -365,7 +415,7 @@ export function SupportChat({
               disabled={busy || (!!selectedId && !thread)}
             />
             <div className="support-composer-footer">
-              <small>{body.length}/4000</small>
+              <small id="support-body-counter">{body.length}/4000</small>
               <button
                 className="service-button"
                 type="submit"

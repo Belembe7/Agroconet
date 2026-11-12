@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { AuthField } from "@/features/auth/field";
 import { safeInternalPath } from "@/lib/area-access";
@@ -10,7 +10,15 @@ import { authClient } from "@/lib/auth-client";
 import { mergeGuestCartAfterLogin } from "@/features/cart/actions";
 import { toast } from "sonner";
 
-export function LoginForm() {
+export function LoginForm({
+  compact = false,
+  locale = "pt",
+  onFilledChange,
+}: {
+  compact?: boolean;
+  locale?: "pt" | "en";
+  onFilledChange?: (filled: boolean) => void;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = safeInternalPath(searchParams.get("next"));
@@ -19,6 +27,10 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    onFilledChange?.(Boolean(email.trim() && password));
+  }, [email, onFilledChange, password]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -51,26 +63,42 @@ export function LoginForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={compact ? "hero-login-form" : "space-y-4"}>
       <form className="space-y-3" onSubmit={onSubmit}>
         <AuthField
-          label="Email"
+          label={locale === "en" ? "Email address" : "Email"}
           value={email}
-          onChange={setEmail}
+          onChange={(value) => {
+            setEmail(value);
+            setError(null);
+          }}
           type="email"
           autoComplete="email"
         />
         <AuthField
-          label="Palavra-passe"
+          label={locale === "en" ? "Password" : "Palavra-passe"}
           value={password}
-          onChange={setPassword}
+          onChange={(value) => {
+            setPassword(value);
+            setError(null);
+          }}
           type="password"
           autoComplete="current-password"
           minLength={8}
         />
-        {error ? <p className="text-sm text-red-700">{error}</p> : null}
+        {error ? (
+          <p role="alert" className="text-sm text-red-700">
+            {error}
+          </p>
+        ) : null}
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "A entrar…" : "Entrar"}
+          {pending
+            ? locale === "en"
+              ? "Signing in…"
+              : "A entrar…"
+            : locale === "en"
+              ? "Sign in"
+              : "Entrar"}
         </Button>
       </form>
 
@@ -79,18 +107,20 @@ export function LoginForm() {
           href="/recuperar"
           className="text-primary font-medium underline-offset-2 hover:underline"
         >
-          Esqueci a palavra-passe
+          {locale === "en" ? "Forgot password?" : "Esqueci a palavra-passe"}
         </Link>
       </p>
-      <p className="text-muted-foreground text-center text-sm">
-        Ainda não tem conta?{" "}
-        <Link
-          href="/registar"
-          className="text-primary font-medium underline-offset-2 hover:underline"
-        >
-          Criar conta
-        </Link>
-      </p>
+      {!compact ? (
+        <p className="text-muted-foreground text-center text-sm">
+          {locale === "en" ? "New here?" : "Ainda não tem conta?"}{" "}
+          <Link
+            href="/registar"
+            className="text-primary font-medium underline-offset-2 hover:underline"
+          >
+            {locale === "en" ? "Create account" : "Criar conta"}
+          </Link>
+        </p>
+      ) : null}
     </div>
   );
 }

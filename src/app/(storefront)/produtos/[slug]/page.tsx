@@ -85,6 +85,8 @@ async function ProductContent({ params }: Props) {
   if (product.slug !== slug)
     permanentRedirect(`/produtos/${encodeURIComponent(product.slug)}`);
   const fallbackImage = productImageAsset(product.name);
+  const estimated =
+    product.description?.startsWith("Dados estimados:") ?? false;
 
   const schema = {
     "@context": "https://schema.org",
@@ -148,7 +150,9 @@ async function ProductContent({ params }: Props) {
       <section className="product-detail-grid">
         <div className="product-gallery" aria-label="Imagens do produto">
           {product.images[0]?.url ? (
-            <div className="product-gallery-main">
+            <div
+              className={`product-gallery-main${estimated ? "product-gallery-main-packaging" : ""}`}
+            >
               <Image
                 src={product.images[0].url}
                 alt={product.images[0].alt || product.name}
@@ -156,6 +160,11 @@ async function ProductContent({ params }: Props) {
                 priority
                 sizes="(max-width: 800px) 100vw, 50vw"
                 unoptimized={/^https?:\/\//.test(product.images[0].url)}
+                className={
+                  estimated
+                    ? "product-packaging-detail-photo object-contain"
+                    : ""
+                }
               />
             </div>
           ) : fallbackImage ? (
@@ -224,10 +233,16 @@ async function ProductContent({ params }: Props) {
             <PriceTag cents={minimumPrice} />
           </div>
           <p className="product-detail-seller">
-            Vendido por <strong>{product.seller.businessName}</strong>
-            {product.seller.ratingCount > 0
-              ? ` · ${product.seller.ratingAvg.toFixed(1)} (${product.seller.ratingCount} avaliações)`
-              : " · Vendedor aprovado"}
+            {estimated ? (
+              "Fornecedor por confirmar"
+            ) : (
+              <>
+                Vendido por <strong>{product.seller.businessName}</strong>
+                {product.seller.ratingCount > 0
+                  ? ` · ${product.seller.ratingAvg.toFixed(1)} (${product.seller.ratingCount} avaliações)`
+                  : " · Vendedor aprovado"}
+              </>
+            )}
           </p>
           {product.variants.length ? (
             <AddToCartForm
@@ -248,8 +263,9 @@ async function ProductContent({ params }: Props) {
           <div className="product-trust-note">
             <ShieldCheck aria-hidden="true" className="size-5" />
             <span>
-              Produto de vendedor aprovado. Confirme disponibilidade e entrega
-              antes de concluir a compra.
+              {estimated
+                ? "Dados estimados para apresentação. Confirme o preço, a embalagem, o fornecedor e o stock antes de comprar."
+                : "Produto de vendedor aprovado. Confirme disponibilidade e entrega antes de concluir a compra."}
             </span>
           </div>
           {product.description ? (

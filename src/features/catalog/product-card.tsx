@@ -15,7 +15,13 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
       href={`/produtos/${encodeURIComponent(product.slug)}`}
       className="catalog-product-card"
     >
-      <div className="catalog-product-image">
+      <div
+        className={
+          product.estimated
+            ? "catalog-product-image catalog-product-image-packaging"
+            : "catalog-product-image"
+        }
+      >
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -23,6 +29,11 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             unoptimized={/^https?:\/\//.test(product.imageUrl)}
+            className={
+              product.estimated
+                ? "product-packaging-photo object-contain"
+                : "object-cover"
+            }
           />
         ) : productFallbackImage ? (
           <ProductFallbackPhoto
@@ -60,7 +71,11 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
           {product.label}
           {product.brand ? ` · ${product.brand}` : ""}
         </p>
-        <p className="catalog-product-seller">Por {product.seller}</p>
+        <p className="catalog-product-seller">
+          {product.estimated
+            ? "Fornecedor por confirmar"
+            : `Por ${product.seller}`}
+        </p>
         <div className="catalog-product-price">
           <span>A partir de</span>
           <PriceTag cents={product.priceCents} />

@@ -9,7 +9,10 @@ export async function reviewSellerAction(formData: FormData) {
   const session = await getAppSession();
   if (!session) throw new Error("Sessão necessária.");
   const id = String(formData.get("id") ?? "");
-  const approved = formData.get("decision") === "approve";
+  const decision = String(formData.get("decision") ?? "");
+  if (decision !== "approve" && decision !== "reject")
+    throw new Error("Escolha uma decisão válida.");
+  const approved = decision === "approve";
   await new AdminService(prisma).reviewSeller(
     session.actor,
     id,
@@ -23,7 +26,10 @@ export async function reviewProductAction(formData: FormData) {
   const session = await getAppSession();
   if (!session) throw new Error("Sessão necessária.");
   const id = String(formData.get("id") ?? "");
-  const approved = formData.get("decision") === "approve";
+  const decision = String(formData.get("decision") ?? "");
+  if (decision !== "approve" && decision !== "reject")
+    throw new Error("Escolha uma decisão válida.");
+  const approved = decision === "approve";
   await new AdminService(prisma).reviewProduct(
     session.actor,
     id,
@@ -60,7 +66,12 @@ export async function setCategoryActiveAction(formData: FormData) {
   await new AdminService(prisma).setCategoryActive(
     session.actor,
     String(formData.get("id") ?? ""),
-    formData.get("active") === "true",
+    (() => {
+      const active = String(formData.get("active") ?? "");
+      if (active !== "true" && active !== "false")
+        throw new Error("Estado de categoria inválido.");
+      return active === "true";
+    })(),
   );
   revalidatePath("/admin");
   revalidatePath("/produtos");

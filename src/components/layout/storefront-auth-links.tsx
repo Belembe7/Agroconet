@@ -108,9 +108,6 @@ export async function StorefrontAuthLinks({
           <Link prefetch={false} href="/carrinho">
             {locale === "en" ? "Cart" : "Carrinho"}
           </Link>
-          <Link prefetch={false} href="/#contactos">
-            {locale === "en" ? "Contact" : "Contactos"}
-          </Link>
         </nav>
       </details>
     </>

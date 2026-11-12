@@ -16,21 +16,33 @@ export async function placeOrderAction(formData: FormData) {
     paymentMethod !== "COD" ||
     !/^[0-9a-f-]{36}$/i.test(idempotencyKey)
   )
-    throw new Error("Dados do checkout inválidos.");
-  const previousOrder = await prisma.order.findFirst({
-    where: { userId: session.user.id, idempotencyKey },
-    select: { id: true },
-  });
+    redirect("/checkout?erro=dados");
+  let previousOrder: { id: string } | null;
+  try {
+    previousOrder = await prisma.order.findFirst({
+      where: { userId: session.user.id, idempotencyKey },
+      select: { id: true },
+    });
+  } catch {
+    redirect("/checkout?erro=pedido");
+  }
   if (previousOrder)
     redirect(`/cliente/pedidos/${previousOrder.id}?pedido=feito`);
-  const cart = await new CartService(prisma).read({ userId: session.user.id });
-  const order = await new OrderService(prisma).place({
-    userId: session.user.id,
-    cart,
-    addressId,
-    paymentMethod,
-    idempotencyKey,
-  });
+  let order: Awaited<ReturnType<OrderService["place"]>>;
+  try {
+    const cart = await new CartService(prisma).read({
+      userId: session.user.id,
+    });
+    order = await new OrderService(prisma).place({
+      userId: session.user.id,
+      cart,
+      addressId,
+      paymentMethod,
+      idempotencyKey,
+    });
+  } catch {
+    redirect("/checkout?erro=pedido");
+  }
   await prisma.cartItem.deleteMany({
     where: { cart: { userId: session.user.id } },
   });

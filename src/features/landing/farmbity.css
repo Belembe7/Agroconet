@@ -1,0 +1,3532 @@
+/* Agroconet public marketplace design system, based on the verified Farmbity page structure. */
+:root {
+  --background: oklch(98% 0.02 120);
+  --foreground: oklch(20% 0.02 120);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(20% 0.02 120);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(20% 0.02 120);
+  --primary: oklch(70% 0.18 136);
+  --primary-foreground: oklch(18% 0.02 120);
+  --secondary: oklch(92% 0.02 60);
+  --secondary-foreground: oklch(28% 0.02 60);
+  --muted: oklch(94% 0.01 120);
+  --muted-foreground: oklch(45% 0.01 120);
+  --accent: oklch(92% 0.02 60);
+  --accent-foreground: oklch(28% 0.02 60);
+  --destructive: oklch(58% 0.2 25);
+  --border: oklch(88% 0.01 120);
+  --input: oklch(88% 0.01 120);
+  --ring: oklch(70% 0.18 136);
+  --radius: 0.65rem;
+  --sidebar: oklch(98% 0.02 120);
+  --sidebar-foreground: oklch(20% 0.02 120);
+  --sidebar-primary: oklch(70% 0.18 136);
+  --sidebar-primary-foreground: oklch(18% 0.02 120);
+  --sidebar-accent: oklch(94% 0.01 120);
+  --sidebar-accent-foreground: oklch(20% 0.02 120);
+  --sidebar-border: oklch(88% 0.01 120);
+  --sidebar-ring: oklch(70% 0.18 136);
+  --font-ui:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-brand: Georgia, "Times New Roman", serif;
+  --farm-container: 80rem;
+  --farm-gutter: 32px;
+  --farm-green: oklch(70% 0.18 136);
+  --farm-ink: oklch(20% 0.02 120);
+  --farm-muted: oklch(45% 0.01 120);
+  --farm-line: oklch(88% 0.01 120);
+  --farm-paper: oklch(98% 0.02 120);
+}
+
+/* Reference layout refinements for public storefront pages. */
+.storefront-frame {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.storefront-content {
+  flex: 1 0 auto;
+}
+
+.storefront-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 94%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.storefront-navigation {
+  display: flex;
+  width: min(100%, var(--farm-container));
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 0 auto;
+  padding: 10px var(--farm-gutter);
+}
+
+.brand-lockup {
+  width: auto;
+  height: auto;
+  flex: none;
+  gap: 10px;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.brand-lockup-image {
+  width: 42px;
+  height: 42px;
+}
+
+.brand-lockup > span {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.desktop-store-nav {
+  display: flex;
+  width: auto;
+  min-height: auto;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 2.4vw, 36px);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.desktop-store-nav a {
+  min-height: 40px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.desktop-store-nav a:hover {
+  color: var(--foreground);
+}
+
+.storefront-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.storefront-language-control {
+  position: relative;
+  display: inline-flex;
+  width: 40px;
+  min-width: 40px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid var(--farm-line);
+  border-radius: 50%;
+  padding: 0;
+  color: var(--muted-foreground);
+}
+
+.storefront-language {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.storefront-language select {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.storefront-language-control:focus-within {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.storefront-actions > .store-login,
+.storefront-actions > .store-account-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0 9px;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.storefront-actions > .store-register {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--primary);
+  border-radius: calc(var(--radius) - 0.15rem);
+  padding: 0 16px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.farmbity-theme-toggle {
+  min-width: 36px;
+  border-color: var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.mobile-store-menu {
+  display: none;
+}
+
+.agro-home .agro-hero {
+  position: relative;
+  display: block;
+  min-height: 34rem;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.agro-home .agro-hero-image {
+  object-position: center 46%;
+}
+
+.agro-home .agro-hero-shade {
+  background: linear-gradient(
+    90deg,
+    rgb(7 19 11 / 78%) 0%,
+    rgb(7 19 11 / 58%) 48%,
+    rgb(7 19 11 / 34%) 100%
+  );
+}
+
+.agro-hero-layout {
+  display: grid;
+  width: min(100%, var(--farm-container));
+  min-height: 34rem;
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+  align-items: center;
+  gap: clamp(36px, 7vw, 104px);
+  margin: 0 auto;
+  padding: 54px var(--farm-gutter) 60px;
+}
+
+.agro-hero-content {
+  width: auto;
+  max-width: 720px;
+  padding: 0;
+}
+
+.agro-home .agro-hero h1 {
+  max-width: 720px;
+  margin-top: 18px;
+  font-size: clamp(38px, 4.7vw, 62px);
+  line-height: 1.06;
+}
+
+.agro-home .agro-hero-title {
+  min-height: 2.12em;
+}
+
+.agro-hero-title-slide {
+  display: block;
+  animation: agro-hero-title-enter 1400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes agro-hero-title-enter {
+  from {
+    opacity: 0.35;
+    translate: 0 0.08em;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agro-hero-title-slide {
+    animation: none;
+  }
+}
+
+.agro-home .agro-hero-description {
+  max-width: 600px;
+  margin-top: 18px;
+  font-size: 16px;
+}
+
+.agro-hero-location {
+  margin-top: 22px;
+  font-size: 13px;
+}
+
+.hero-login-card {
+  width: 100%;
+  border: 1px solid color-mix(in oklab, var(--border) 84%, transparent);
+  border-radius: var(--radius);
+  padding: 24px;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 18%);
+  transition: translate 800ms ease-out;
+}
+
+.hero-login-card-floating {
+  animation: hero-login-float 4.8s ease-in-out infinite;
+}
+
+@keyframes hero-login-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-login-card-floating {
+    animation: none;
+  }
+}
+
+.hero-login-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hero-login-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--primary) 24%, var(--card));
+  color: color-mix(in oklab, var(--primary) 70%, var(--foreground));
+}
+
+.hero-login-heading p,
+.home-search-copy > p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.hero-login-heading h2 {
+  margin: 3px 0 0;
+  color: var(--card-foreground);
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.hero-login-form,
+.hero-login-form form {
+  display: grid;
+  gap: 11px;
+}
+
+.hero-login-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--card-foreground);
+  font-size: 12px;
+}
+
+.hero-login-form label > span {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.hero-login-form input {
+  min-height: 42px;
+  border-color: var(--border);
+  border-radius: calc(var(--radius) - 0.15rem);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 13px;
+}
+
+.hero-login-form button[type="submit"] {
+  min-height: 42px;
+  margin-top: 2px;
+  border-radius: calc(var(--radius) - 0.15rem);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero-login-form > p {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+.hero-login-register {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 16px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.hero-login-register a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--foreground);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-search-section {
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+}
+
+.home-search-inner {
+  display: grid;
+  width: min(100%, var(--farm-container));
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+  align-items: center;
+  gap: 38px;
+  margin: 0 auto;
+  padding: 24px var(--farm-gutter);
+}
+
+.home-search-copy h2 {
+  margin: 4px 0 0;
+  color: var(--foreground);
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.home-search-form {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 5px 4px 14px;
+  background: var(--card);
+  color: var(--muted-foreground);
+}
+
+.home-search-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 14px;
+}
+
+.home-search-form input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.home-search-form button {
+  display: inline-flex;
+  min-height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: calc(var(--radius) - 0.15rem);
+  padding: 0 15px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.agro-home .agro-benefits {
+  width: min(100%, var(--farm-container));
+  padding-top: 14px;
+  padding-bottom: 0;
+}
+
+.agro-home .agro-benefits-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.agro-home .agro-benefit-card {
+  min-height: 82px;
+  gap: 11px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 12px 18px;
+}
+
+.agro-home .agro-benefit-card:first-child {
+  padding-left: 0;
+}
+
+.agro-home .agro-benefit-card:last-child {
+  border-right: 0;
+}
+
+.agro-home .agro-benefit-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.agro-home .agro-benefit-card h2 {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.agro-home .agro-benefit-card p {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.agro-home .landing-categories {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.agro-home .landing-category {
+  position: relative;
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding-top: 134px;
+  background: var(--card);
+  color: var(--card-foreground);
+  text-decoration: none;
+}
+
+.agro-home .landing-category-art {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: 134px;
+  mask-image: none;
+  background-color: var(--muted);
+  opacity: 1;
+}
+
+.agro-home .landing-category::after {
+  inset: 0 0 auto;
+  height: 134px;
+  background: linear-gradient(180deg, transparent 45%, rgb(0 0 0 / 22%));
+}
+
+.agro-home .landing-category-content {
+  position: relative;
+  display: block;
+  min-height: 104px;
+  padding: 15px 16px 16px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.agro-home .landing-category .category-top {
+  display: none;
+}
+
+.agro-home .landing-category h3 {
+  margin: 0;
+  color: var(--card-foreground);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.agro-home .landing-category > .landing-category-content > p {
+  margin: 7px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.agro-home .category-link-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.agro-home .landing-category:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+
+.agro-home .agro-highlights-section {
+  background: var(--background);
+}
+
+.agro-home .landing-product-link {
+  border-color: var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: none;
+}
+
+.agro-home .landing-product-link:hover {
+  border-color: color-mix(in oklab, var(--primary) 60%, var(--border));
+  box-shadow: 0 8px 20px color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+
+.farm-how-page .farm-anchor-nav {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0
+    max(
+      var(--farm-gutter),
+      calc((100vw - var(--farm-container)) / 2 + var(--farm-gutter))
+    );
+  white-space: nowrap;
+}
+
+.farm-how-page .farm-anchor-nav a {
+  min-height: 36px;
+  border: 0;
+  border-radius: calc(var(--radius) - 0.15rem);
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.farm-how-page .farm-anchor-nav a:hover {
+  background: var(--muted);
+}
+
+.farm-how-page .farm-journey-grid {
+  column-gap: 32px;
+  row-gap: 30px;
+}
+
+.farm-how-page .farm-journey-card {
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.farm-how-page .farm-journey-copy h3 {
+  margin-top: 4px;
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.farm-how-page .farm-journey-copy > p:last-child {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.farm-how-page .farm-profile-row {
+  grid-template-columns: 10rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding-block: 34px;
+  border-bottom: 1px solid var(--border);
+}
+
+.farm-how-page .farm-profile-row:last-child {
+  border-bottom: 0;
+}
+
+.farm-public-hero-shade {
+  background: rgb(6 16 10 / 65%);
+}
+
+.farm-public-hero h1 {
+  max-width: 48rem;
+  font-size: clamp(32px, 4.5vw, 48px);
+}
+
+.farm-how-page .farm-profile-row-index {
+  height: auto;
+  justify-content: flex-start;
+  gap: 18px;
+  border: 0;
+}
+
+.farm-how-page .farm-profile-row-index svg {
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: calc(var(--radius) - 0.15rem);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.farm-how-page .farm-profile-row h2 {
+  margin-block: 7px;
+  font-size: clamp(24px, 2.5vw, 32px);
+  font-weight: 700;
+}
+
+.farm-how-page .farm-profile-action {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.farm-how-page .farm-advice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.farm-how-page .farm-advice-grid article {
+  border: 0;
+  border-left: 4px solid var(--primary);
+  border-radius: 0;
+  padding: 7px 0 7px 18px;
+  background: transparent;
+}
+
+.farm-about-intro {
+  gap: clamp(32px, 7vw, 96px);
+}
+
+.farm-about-roles article {
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.farm-about-roles h3 {
+  margin-top: 24px;
+}
+
+.farm-about-why {
+  padding-top: 20px;
+}
+
+.farm-about-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.farm-about-values article {
+  border-top: 1px solid var(--border);
+  padding: 16px 0 0;
+}
+
+.farm-about-values article > span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.farm-about-values h3 {
+  margin: 22px 0 8px;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.farm-about-values p,
+.farm-about-cta > div > p:last-child {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.farm-about-direction {
+  border-block: 1px solid var(--border);
+  background: color-mix(in oklab, var(--muted) 55%, var(--background));
+}
+
+.farm-about-cta {
+  padding-block: 42px;
+}
+
+.farm-about-cta > div {
+  max-width: 720px;
+}
+
+.farm-about-cta h2 {
+  margin-bottom: 10px;
+}
+
+.farm-contact-hero h1 {
+  margin-top: 12px;
+  font-size: clamp(34px, 4.5vw, 52px);
+}
+
+.farm-contact-grid {
+  align-items: start;
+  gap: 24px;
+}
+
+.farm-contact-card {
+  border-radius: var(--radius);
+  padding: 26px;
+}
+
+.farm-contact-card h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.farm-contact-description {
+  margin: 0 0 18px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.farm-contact-safety {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+  border-left: 4px solid oklch(75% 0.14 80);
+  padding: 12px 14px;
+  background: color-mix(in oklab, oklch(90% 0.1 85) 22%, var(--card));
+}
+
+.farm-contact-safety > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--muted-foreground);
+}
+
+.farm-contact-safety strong {
+  display: block;
+  font-size: 13px;
+}
+
+.farm-contact-safety p {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.auth-experience {
+  position: relative;
+  display: block;
+  min-height: 100svh;
+  padding: 0;
+  background: var(--background);
+}
+
+.auth-form-side {
+  width: 100%;
+  min-height: 100svh;
+  align-items: stretch;
+}
+
+.auth-form-side header {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  padding: 22px max(24px, calc((100vw - var(--farm-container)) / 2));
+}
+
+.auth-form-side main {
+  display: flex;
+  width: min(100%, 520px);
+  max-width: 520px;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 88px 24px 72px;
+}
+
+.auth-form-side main > div {
+  width: 100%;
+  border: 1px solid var(--farm-line);
+  border-radius: 18px;
+  padding: 28px;
+  background: var(--card);
+  box-shadow: 0 18px 48px color-mix(in oklab, var(--foreground) 7%, transparent);
+}
+
+.farm-process-card {
+  position: relative;
+  transition:
+    opacity 900ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.farm-process-grid[data-motion="ready"] .farm-process-card {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: none;
+}
+
+.farm-process-grid[data-motion="visible"] .farm-process-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.farm-process-grid[data-motion="visible"] .farm-process-card:nth-child(2) {
+  transition-delay: 1450ms;
+}
+
+.farm-process-grid[data-motion="visible"] .farm-process-card:nth-child(3) {
+  transition-delay: 2900ms;
+}
+
+.farm-process-grid[data-motion="visible"] .farm-process-card:nth-child(4) {
+  transition-delay: 4350ms;
+}
+
+.farm-process-grid[data-motion="visible"] .farm-process-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--farm-line));
+  box-shadow: 0 12px 24px color-mix(in oklab, var(--foreground) 8%, transparent);
+  transition-delay: 0ms;
+}
+
+@media (min-width: 1001px) {
+  .farm-process-card + .farm-process-card::before {
+    position: absolute;
+    top: 24px;
+    left: -15px;
+    width: 15px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--farm-line);
+    clip-path: polygon(
+      0 40%,
+      62% 40%,
+      62% 0,
+      100% 50%,
+      62% 100%,
+      62% 60%,
+      0 60%
+    );
+    content: "";
+    transform: scaleX(0);
+    transform-origin: left center;
+    opacity: 0;
+    transition:
+      opacity 280ms ease,
+      transform 820ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color 280ms ease;
+    filter: drop-shadow(
+      0 0 3px color-mix(in oklab, var(--primary) 48%, transparent)
+    );
+  }
+
+  .farm-process-grid[data-motion="visible"]
+    .farm-process-card:nth-child(n + 2)::before {
+    background: var(--primary);
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  .farm-process-grid[data-motion="visible"]
+    .farm-process-card:nth-child(3)::before {
+    transition-delay: 2000ms;
+  }
+
+  .farm-process-grid[data-motion="visible"]
+    .farm-process-card:nth-child(4)::before {
+    transition-delay: 3450ms;
+  }
+
+  .farm-process-grid[data-motion="visible"]
+    .farm-process-card:nth-child(2)::before {
+    transition-delay: 550ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .farm-process-grid[data-motion] .farm-process-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .farm-process-card + .farm-process-card::before {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (min-width: 1001px) and (prefers-reduced-motion: reduce) {
+  .farm-process-card + .farm-process-card::before {
+    background: var(--primary);
+  }
+}
+
+.public-reveal-sequence > * {
+  --reveal-delay: 0ms;
+  transition:
+    opacity 760ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay),
+    translate 760ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay);
+}
+
+.public-reveal-sequence[data-motion="ready"] > * {
+  opacity: 0;
+  translate: 0 16px;
+  transition: none;
+}
+
+.public-reveal-sequence[data-motion="visible"] > * {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.public-reveal-sequence > :nth-child(2) {
+  --reveal-delay: 100ms;
+}
+
+.public-reveal-sequence > :nth-child(3) {
+  --reveal-delay: 200ms;
+}
+
+.public-reveal-sequence > :nth-child(4) {
+  --reveal-delay: 300ms;
+}
+
+.public-reveal-sequence > :nth-child(5) {
+  --reveal-delay: 400ms;
+}
+
+.public-reveal-sequence > :nth-child(6) {
+  --reveal-delay: 500ms;
+}
+
+.public-reveal-sequence[data-motion="visible"] > .agro-path-card:hover {
+  transition:
+    opacity 760ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay),
+    translate 760ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay),
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-reveal-sequence[data-motion] > * {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
+
+.landing-footer {
+  --footer-inline-inset: max(
+    var(--farm-gutter),
+    calc((100vw - var(--farm-container)) / 2 + var(--farm-gutter))
+  );
+  border-top: 0;
+  background: #123b2a;
+  color: #edf4e6;
+  padding: 0 var(--footer-inline-inset) 24px;
+}
+
+.footer-grid {
+  grid-template-columns: 1.35fr 1fr 1fr 1.1fr;
+  gap: 30px;
+}
+
+.landing-footer .footer-grid h3 {
+  margin: 18px 0 8px;
+  color: #d4e7a3;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.landing-footer .footer-grid > div > a:hover,
+.landing-footer .public-contacts a:hover {
+  color: #e4f480;
+}
+
+.footer-updates {
+  display: flex;
+  width: calc(100% + var(--footer-inline-inset) + var(--footer-inline-inset));
+  min-height: 310px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin: 0 calc(0px - var(--footer-inline-inset)) 46px;
+  padding: 54px var(--footer-inline-inset);
+  background-color: #123b2a;
+  background-image:
+    linear-gradient(
+      90deg,
+      #123b2a 0%,
+      rgb(18 59 42 / 95%) 32%,
+      rgb(18 59 42 / 68%) 58%,
+      rgb(18 59 42 / 18%) 100%
+    ),
+    url("/images/agro-editorial.png");
+  background-position:
+    center,
+    right 44%;
+  background-size: cover;
+  color: #fff;
+}
+
+.footer-updates-copy {
+  max-width: 660px;
+}
+
+.footer-updates-eyebrow {
+  margin: 0 0 10px;
+  color: #d4e7a3;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.footer-updates-copy h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.footer-updates-copy > p:last-child {
+  max-width: 560px;
+  margin: 14px 0 0;
+  color: rgb(237 244 230 / 86%);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.footer-updates-cta {
+  display: inline-flex;
+  min-height: 46px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgb(237 244 230 / 72%);
+  border-radius: 6px;
+  padding: 0 20px;
+  background: rgb(18 59 42 / 24%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.footer-updates-cta:hover {
+  transform: translateY(-1px);
+  border-color: #d4e7a3;
+  background: #d4e7a3;
+  color: #123b2a;
+}
+
+.footer-updates-cta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.landing-footer .brand-lockup {
+  border-radius: 0;
+  background: transparent;
+}
+
+.footer-manifesto {
+  max-width: 320px;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1000px) {
+  .desktop-store-nav {
+    display: none;
+  }
+
+  .mobile-store-menu {
+    display: block;
+  }
+
+  .agro-hero-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+    gap: 30px;
+  }
+
+  .agro-home .landing-categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .farm-about-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .farm-how-page .farm-profile-row {
+    grid-template-columns: 7rem minmax(0, 1fr) auto;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .footer-updates {
+    margin-bottom: 42px;
+  }
+}
+
+@media (max-width: 760px) {
+  .auth-form-side header {
+    padding: 16px var(--farm-gutter);
+  }
+
+  .auth-form-side main {
+    padding: 80px 20px 44px;
+  }
+
+  .auth-form-side main > div {
+    padding: 24px;
+  }
+
+  .storefront-navigation {
+    min-height: 64px;
+    gap: 10px;
+    padding-block: 8px;
+  }
+
+  .brand-lockup {
+    gap: 7px;
+  }
+
+  .brand-lockup-image {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-lockup > span {
+    font-size: 15px;
+  }
+
+  .storefront-actions {
+    gap: 5px;
+  }
+
+  .storefront-actions > .store-login,
+  .storefront-actions > .store-account-link,
+  .storefront-actions > .store-register {
+    display: none;
+  }
+
+  .storefront-language-control > svg {
+    display: none;
+  }
+
+  .storefront-language select {
+    width: 76px;
+    max-width: 76px;
+    overflow: hidden;
+    color: var(--foreground);
+  }
+
+  .agro-home .agro-hero,
+  .agro-hero-layout {
+    min-height: 0;
+  }
+
+  .agro-hero-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding-block: 42px;
+  }
+
+  .agro-home .agro-hero h1 {
+    font-size: clamp(34px, 8vw, 48px);
+  }
+
+  .agro-home .agro-hero-shade {
+    background: linear-gradient(180deg, rgb(7 19 11 / 78%), rgb(7 19 11 / 58%));
+  }
+
+  .hero-login-card {
+    max-width: 440px;
+    padding: 20px;
+  }
+
+  .home-search-inner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-block: 20px;
+  }
+
+  .home-search-copy h2 {
+    font-size: 18px;
+  }
+
+  .agro-home .agro-benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-block: 8px;
+  }
+
+  .agro-home .agro-benefit-card,
+  .agro-home .agro-benefit-card:first-child {
+    min-height: 76px;
+    border-right: 0;
+    padding: 10px 8px;
+  }
+
+  .agro-home .landing-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .agro-home .landing-category {
+    min-height: 220px;
+    padding-top: 118px;
+  }
+
+  .agro-home .landing-category-art,
+  .agro-home .landing-category::after {
+    height: 118px;
+  }
+
+  .agro-home .landing-category-content {
+    padding: 12px;
+  }
+
+  .agro-home .landing-category h3 {
+    font-size: 15px;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-updates {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 340px;
+    padding: 42px var(--footer-inline-inset);
+    background-image:
+      linear-gradient(
+        90deg,
+        rgb(18 59 42 / 96%) 0%,
+        rgb(18 59 42 / 82%) 58%,
+        rgb(18 59 42 / 48%) 100%
+      ),
+      url("/images/agro-editorial.png");
+    background-position:
+      center,
+      62% center;
+  }
+
+  .footer-grid > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .farm-how-page .farm-profile-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-block: 24px;
+  }
+
+  .farm-how-page .farm-profile-row-index {
+    align-items: center;
+  }
+
+  .farm-how-page .farm-profile-action {
+    justify-self: start;
+  }
+
+  .farm-how-page .farm-advice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .farm-about-values {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-lockup > span {
+    max-width: 92px;
+    font-size: 13px;
+  }
+
+  .farmbity-theme-toggle {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    padding: 0;
+  }
+
+  .agro-home .landing-categories {
+    gap: 9px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-updates-cta {
+    width: fit-content;
+  }
+
+  .footer-grid > div:first-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  :root {
+    --farm-gutter: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --farm-gutter: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --farm-gutter: 16px;
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --farm-container: 96rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --farm-container: 120rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --farm-container: 140rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .agro-hero,
+  .farm-public-hero {
+    min-height: 29rem;
+  }
+
+  .agro-hero-content,
+  .farm-public-hero-copy {
+    padding-block: 5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .farm-journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1000px) {
+  .storefront-subnav {
+    display: block;
+  }
+
+  .desktop-store-nav {
+    display: flex;
+  }
+
+  .mobile-store-menu {
+    display: none;
+  }
+}
+
+.dark {
+  --background: oklch(18% 0.02 120);
+  --foreground: oklch(98% 0.02 90);
+  --card: oklch(23% 0.02 120);
+  --card-foreground: oklch(98% 0.02 90);
+  --popover: oklch(23% 0.02 120);
+  --popover-foreground: oklch(98% 0.02 90);
+  --primary: oklch(65% 0.2 136);
+  --primary-foreground: oklch(18% 0.02 120);
+  --secondary: oklch(28% 0.02 60);
+  --secondary-foreground: oklch(98% 0.02 90);
+  --muted: oklch(28% 0.01 120);
+  --muted-foreground: oklch(75% 0.01 120);
+  --accent: oklch(28% 0.02 60);
+  --accent-foreground: oklch(98% 0.02 90);
+  --border: oklch(30% 0.01 120);
+  --input: oklch(30% 0.01 120);
+  --ring: oklch(65% 0.2 136);
+  --sidebar: oklch(18% 0.02 120);
+  --sidebar-foreground: oklch(98% 0.02 90);
+  --sidebar-primary: oklch(65% 0.2 136);
+  --sidebar-primary-foreground: oklch(18% 0.02 120);
+  --sidebar-accent: oklch(28% 0.01 120);
+  --sidebar-accent-foreground: oklch(98% 0.02 90);
+  --sidebar-border: oklch(30% 0.01 120);
+  --sidebar-ring: oklch(65% 0.2 136);
+  --farm-green: var(--primary);
+  --farm-ink: var(--foreground);
+  --farm-muted: var(--muted-foreground);
+  --farm-line: var(--border);
+  --farm-paper: var(--background);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+:where(button, input, select, textarea) {
+  font: inherit;
+}
+
+@layer components {
+  .storefront-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--farm-line);
+    background: color-mix(in oklab, var(--background) 88%, transparent);
+    box-shadow: none;
+    backdrop-filter: blur(14px);
+  }
+
+  .guide-ribbon {
+    justify-content: center;
+    gap: 16px;
+    background: var(--farm-paper);
+    color: var(--farm-muted);
+    border-bottom: 1px solid var(--farm-line);
+    padding: 7px max(18px, calc((100vw - var(--farm-container)) / 2));
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .guide-ribbon > span > svg {
+    color: var(--farm-green);
+  }
+
+  .storefront-navigation {
+    grid-template-columns: 88px minmax(210px, 1fr) auto auto;
+    max-width: var(--farm-container);
+    gap: 20px;
+    padding: 12px var(--farm-gutter);
+  }
+
+  .brand-lockup {
+    width: 64px;
+    height: 64px;
+  }
+
+  .brand-lockup-image {
+    width: 64px;
+  }
+
+  .storefront-header-search,
+  .catalog-search,
+  .catalog-filter-search {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+    color: var(--farm-muted);
+  }
+
+  .storefront-header-search:focus-within,
+  .catalog-search:focus-within,
+  .catalog-filter-search:focus-within {
+    border-color: var(--farm-green);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--farm-green) 15%, transparent);
+  }
+
+  .storefront-header-search input,
+  .catalog-search input,
+  .catalog-filter-search input {
+    color: var(--farm-ink);
+  }
+
+  .storefront-header-search button,
+  .catalog-search button,
+  .catalog-filter-button {
+    border-radius: calc(var(--radius) - 0.15rem);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    transition: background-color 150ms ease;
+  }
+
+  .storefront-header-search button:hover,
+  .catalog-search button:hover,
+  .catalog-filter-button:hover {
+    background: color-mix(in oklab, var(--primary) 86%, var(--foreground));
+  }
+
+  .storefront-locale,
+  .storefront-language-control,
+  .desktop-store-nav a,
+  .store-login,
+  .store-register {
+    color: var(--farm-ink);
+  }
+
+  .storefront-locale small {
+    color: var(--farm-muted);
+  }
+
+  .storefront-language-control,
+  .storefront-language {
+    border-color: var(--farm-line);
+  }
+
+  .storefront-subnav {
+    border: 0;
+    background: transparent;
+  }
+
+  .desktop-store-nav {
+    width: min(var(--farm-container), 100%);
+    min-height: 40px;
+    padding: 0 var(--farm-gutter);
+    gap: 26px;
+  }
+
+  .desktop-store-nav a {
+    min-height: 40px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .desktop-store-nav a:hover,
+  .storefront-locale > a:hover {
+    color: color-mix(in oklab, var(--farm-green) 65%, var(--farm-ink));
+  }
+
+  .store-register {
+    border-radius: calc(var(--radius) - 0.15rem);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .mobile-store-menu summary,
+  .mobile-store-menu nav {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+  }
+
+  .mobile-store-menu nav {
+    background: var(--card);
+    box-shadow: 0 12px 28px
+      color-mix(in oklab, var(--foreground) 9%, transparent);
+  }
+
+  .mobile-store-menu nav a:hover,
+  .mobile-store-menu nav .mobile-store-logout:hover {
+    background: var(--muted);
+  }
+
+  .storefront-skip {
+    border-color: var(--primary);
+    border-radius: var(--radius);
+  }
+
+  .landing-footer {
+    border-top: 1px solid var(--farm-line);
+    background: color-mix(in oklab, var(--secondary) 36%, var(--background));
+    padding: 52px
+      max(
+        var(--farm-gutter),
+        calc((100vw - var(--farm-container)) / 2 + var(--farm-gutter))
+      )
+      24px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1.45fr 0.85fr 0.85fr 0.9fr 1fr;
+    gap: 26px;
+    max-width: var(--farm-container);
+    margin: 0 auto;
+  }
+
+  .footer-grid h2 {
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .footer-grid > div > a:not(:first-child),
+  .public-contacts a,
+  .public-contacts p {
+    min-height: 36px;
+    color: var(--farm-muted);
+    font-size: 13px;
+  }
+
+  .footer-grid > div > a:hover,
+  .public-contacts a:hover {
+    color: var(--farm-ink);
+  }
+
+  .footer-manifesto {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .footer-small,
+  .footer-bottom {
+    color: var(--farm-muted);
+  }
+
+  .footer-bottom {
+    max-width: var(--farm-container);
+    margin: 30px auto 0;
+    border-color: var(--farm-line);
+    font-size: 12px;
+  }
+
+  .agro-home {
+    --agro-forest: oklch(20% 0.02 120);
+    --agro-leaf: var(--primary);
+    --agro-lime: var(--primary);
+    --agro-ink: var(--farm-ink);
+    --agro-copy: var(--farm-muted);
+    --agro-paper: var(--farm-paper);
+    color: var(--farm-ink);
+    background: var(--background);
+  }
+
+  .agro-hero {
+    display: flex;
+    min-height: 25rem;
+    align-items: center;
+    justify-content: center;
+    background: oklch(17% 0.03 140);
+  }
+
+  .agro-hero-image {
+    z-index: -2;
+    object-fit: cover;
+    object-position: center 48%;
+  }
+
+  .agro-hero-shade {
+    z-index: -1;
+    background: rgb(6 16 10 / 57%);
+  }
+
+  .agro-hero-content {
+    width: min(100% - 48px, 920px);
+    padding: 56px 0 62px;
+    text-align: left;
+  }
+
+  .agro-hero-eyebrow {
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+
+  .agro-hero-eyebrow svg {
+    color: var(--primary);
+  }
+
+  .agro-hero h1 {
+    max-width: 780px;
+    margin: 20px 0 0;
+    font-size: clamp(38px, 5.2vw, 64px);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    text-shadow: none;
+  }
+
+  .agro-hero h1 span {
+    color: white;
+    font-family: inherit;
+    font-style: normal;
+    font-weight: 650;
+    letter-spacing: inherit;
+  }
+
+  .agro-hero-description {
+    max-width: 700px;
+    margin: 18px 0 0;
+    color: rgb(255 255 255 / 88%);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .agro-hero-actions {
+    justify-content: flex-start;
+    margin-top: 22px;
+  }
+
+  .agro-button,
+  .farm-button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid transparent;
+    border-radius: calc(var(--radius) - 0.15rem);
+    padding: 0 17px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .agro-button-lime,
+  .farm-button-primary {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .agro-button-lime:hover,
+  .farm-button-primary:hover {
+    background: color-mix(in oklab, var(--primary) 86%, var(--foreground));
+  }
+
+  .agro-button-ghost,
+  .farm-button-outline {
+    border-color: rgb(255 255 255 / 60%);
+    background: transparent;
+    color: white;
+  }
+
+  .agro-button-ghost:hover,
+  .farm-button-outline:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .farm-home-search {
+    display: flex;
+    width: min(100%, 680px);
+    min-height: 54px;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    padding: 5px 5px 5px 15px;
+    background: white;
+    color: var(--farm-muted);
+  }
+
+  .farm-home-search input {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--farm-ink);
+    font-size: 14px;
+  }
+
+  .farm-home-search input::placeholder {
+    color: oklch(53% 0.01 120);
+  }
+
+  .farm-home-search button {
+    display: inline-flex;
+    min-height: 42px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 0;
+    border-radius: calc(var(--radius) - 0.15rem);
+    padding: 0 14px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .agro-hero-location {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 17px;
+    color: rgb(255 255 255 / 84%);
+    font-size: 12px;
+  }
+
+  .farm-location-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  .agro-home .guide-section,
+  .farm-process-section,
+  .farm-roles-section {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    padding: 64px var(--farm-gutter);
+  }
+
+  .agro-home .agro-category-section,
+  .agro-home .agro-highlights-section {
+    padding-top: 62px;
+    padding-bottom: 62px;
+  }
+
+  .agro-home .agro-highlights-section {
+    border-top: 1px solid var(--farm-line);
+  }
+
+  .farm-section-heading,
+  .agro-section-topline {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+  }
+
+  .farm-section-heading h2,
+  .agro-section-topline h2,
+  .farm-public-section h2 {
+    margin: 8px 0 0;
+    color: var(--farm-ink);
+    font-size: clamp(27px, 3vw, 38px);
+    font-weight: 650;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .farm-eyebrow,
+  .agro-eyebrow {
+    margin: 0;
+    color: oklch(46% 0.08 137);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .farm-inline-link,
+  .agro-section-link,
+  .agro-text-link {
+    display: inline-flex;
+    min-height: 40px;
+    flex: none;
+    align-items: center;
+    gap: 7px;
+    color: var(--farm-ink);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .farm-inline-link:hover,
+  .agro-section-link:hover,
+  .agro-text-link:hover {
+    color: oklch(46% 0.08 137);
+  }
+
+  .agro-home .agro-benefits {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    padding: 20px var(--farm-gutter) 0;
+  }
+
+  .agro-home .agro-benefits-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .agro-home .agro-benefit-card {
+    min-height: 98px;
+    border: 0;
+    border-right: 1px solid var(--farm-line);
+    border-radius: 0;
+    padding: 18px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .agro-home .agro-benefit-card:last-child {
+    border-right: 0;
+  }
+
+  .agro-home .agro-benefit-icon {
+    color: oklch(46% 0.08 137);
+  }
+
+  .agro-home .agro-benefit-number {
+    color: var(--farm-muted);
+  }
+
+  .agro-home .agro-benefit-card h2 {
+    color: var(--farm-ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .agro-home .agro-benefit-card p,
+  .agro-home .section-side-note {
+    color: var(--farm-muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .agro-home .landing-categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .agro-home .landing-category {
+    min-height: 176px;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background-color: var(--muted);
+    box-shadow: none;
+  }
+
+  .agro-home .landing-category::after {
+    background: rgb(7 24 14 / 44%);
+  }
+
+  .agro-home .landing-category:hover {
+    transform: none;
+    border-color: color-mix(in oklab, var(--primary) 60%, var(--farm-line));
+    box-shadow: 0 8px 20px
+      color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+
+  .agro-home .landing-category-content {
+    padding: 18px;
+  }
+
+  .agro-home .landing-category h3 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .agro-home .landing-category > p,
+  .agro-home .category-link-label {
+    font-size: 13px;
+  }
+
+  .agro-home .landing-products,
+  .catalog-product-grid,
+  .favorites-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .farm-categories-page .landing-categories {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .farm-categories-page .landing-category {
+    min-height: 190px;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    box-shadow: none;
+    animation: none;
+  }
+
+  .farm-categories-page .landing-category::after {
+    background: rgb(7 24 14 / 40%);
+  }
+
+  .agro-home .landing-product,
+  .catalog-product-card {
+    overflow: hidden;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .agro-home .landing-product-link:hover .landing-product,
+  .catalog-product-card:hover {
+    transform: none;
+    border-color: color-mix(in oklab, var(--primary) 60%, var(--farm-line));
+    box-shadow: 0 8px 18px
+      color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+
+  .agro-home .product-visual,
+  .catalog-product-image {
+    aspect-ratio: 1.2 / 1;
+    background: var(--muted);
+    color: var(--farm-muted);
+  }
+
+  .agro-home .product-copy,
+  .catalog-product-copy {
+    padding: 16px;
+  }
+
+  .agro-home .product-copy h3,
+  .catalog-product-copy h2 {
+    color: var(--farm-ink);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+
+  .agro-home .product-category,
+  .catalog-product-category {
+    color: oklch(46% 0.08 137);
+    font-size: 11px;
+  }
+
+  .agro-home .product-option,
+  .agro-home .product-seller,
+  .catalog-product-option,
+  .catalog-product-seller {
+    color: var(--farm-muted);
+    font-size: 12px;
+  }
+
+  .agro-home .product-price,
+  .catalog-product-price {
+    margin-top: 12px;
+    color: var(--farm-ink);
+  }
+
+  .agro-home .product-price > span:last-child {
+    color: #438532;
+    font-weight: 720;
+  }
+
+  .catalog-page,
+  .product-detail-page,
+  .cart-page,
+  .favorites-page {
+    width: min(100%, var(--farm-container));
+    padding: 40px var(--farm-gutter) 72px;
+  }
+
+  .catalog-page-intro h1,
+  .cart-page-heading h1,
+  .favorites-heading h1 {
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  .catalog-page-intro > p:last-child,
+  .cart-page-heading > p:last-child,
+  .favorites-heading > p:last-child {
+    color: var(--farm-muted);
+    font-size: 15px;
+  }
+
+  .catalog-filters {
+    gap: 12px;
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .catalog-filter-search,
+  .catalog-filter-field input,
+  .catalog-filter-field select {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--farm-ink);
+    box-shadow: none;
+  }
+
+  .dark .catalog-filter-search input {
+    background: transparent;
+    color: var(--farm-ink);
+    caret-color: var(--farm-green);
+  }
+
+  .dark .catalog-filter-search input::placeholder {
+    color: var(--farm-muted);
+    opacity: 0.82;
+  }
+
+  .catalog-filter-field > span,
+  .catalog-results-heading > p {
+    color: var(--farm-muted);
+  }
+
+  .catalog-filter-stock input {
+    accent-color: var(--primary);
+  }
+
+  .catalog-results-heading h2 {
+    font-size: clamp(24px, 2.5vw, 32px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .product-detail-grid {
+    gap: 36px;
+  }
+
+  .product-detail-media,
+  .product-detail-copy,
+  .cart-seller-group,
+  .favorites-page > section,
+  .customer-service-page {
+    border-radius: var(--radius);
+  }
+
+  .product-detail-title-row h1 {
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  .auth-experience {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    min-height: 100vh;
+    padding: 0;
+    gap: 0;
+    background: var(--background);
+  }
+
+  .auth-form-side header {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 32px;
+  }
+
+  .auth-form-side main {
+    max-width: 520px;
+  }
+
+  .auth-form-side main > div {
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .auth-back {
+    color: var(--farm-muted);
+    font-size: 13px;
+  }
+
+  .auth-story {
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
+  .auth-story-shade {
+    background: rgb(6 16 10 / 42%);
+  }
+
+  .auth-story-copy > span,
+  .auth-story-copy em {
+    color: var(--primary);
+  }
+
+  .farm-public-page {
+    color: var(--farm-ink);
+    background: var(--background);
+  }
+
+  .farm-public-hero {
+    position: relative;
+    display: flex;
+    min-height: 25rem;
+    align-items: center;
+    overflow: hidden;
+    background: oklch(17% 0.03 140);
+    color: white;
+    isolation: isolate;
+  }
+
+  .farm-public-hero-image {
+    z-index: -2;
+    object-fit: cover;
+    object-position: center 48%;
+  }
+
+  .farm-public-hero-shade {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: rgb(6 16 10 / 56%);
+  }
+
+  .farm-public-hero-copy {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    padding: 64px var(--farm-gutter);
+  }
+
+  .farm-public-hero-copy .farm-eyebrow {
+    color: rgb(255 255 255 / 88%);
+  }
+
+  .farm-public-hero h1,
+  .farm-contact-hero h1 {
+    max-width: 48rem;
+    margin: 14px 0 0;
+    color: white;
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+
+  .farm-public-hero-description {
+    max-width: 42rem;
+    margin: 16px 0 0;
+    color: rgb(255 255 255 / 88%);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .farm-public-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .farm-public-section {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    padding: 56px var(--farm-gutter);
+  }
+
+  .farm-anchor-nav {
+    display: flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 28px;
+    border-bottom: 1px solid var(--farm-line);
+    background: var(--background);
+  }
+
+  .farm-anchor-nav a {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    color: var(--farm-ink);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .farm-anchor-nav a:hover {
+    border-bottom-color: var(--primary);
+  }
+
+  .farm-section-heading-copy {
+    align-items: end;
+  }
+
+  .farm-section-heading-copy > p {
+    max-width: 500px;
+    margin: 0;
+    color: var(--farm-muted);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .farm-journey-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .farm-journey-card,
+  .farm-process-card,
+  .farm-role-card,
+  .farm-advice-grid article,
+  .farm-about-roles article,
+  .farm-contact-card {
+    min-width: 0;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .farm-journey-card {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    align-content: start;
+    gap: 16px;
+    min-height: 0;
+    border: 0;
+    border-top: 1px solid var(--farm-line);
+    border-radius: 0;
+    padding: 20px 0 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .farm-journey-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .farm-journey-copy {
+    grid-column: 2;
+  }
+
+  .farm-journey-icon {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .farm-journey-step {
+    margin: 0 0 4px;
+    color: var(--farm-muted);
+    font-size: 12px !important;
+    font-weight: 600;
+  }
+
+  .farm-journey-copy h3 {
+    margin: 0;
+    color: var(--farm-ink);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .farm-journey-copy > p:last-child {
+    margin: 8px 0 0;
+    color: var(--farm-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .farm-process-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: oklch(46% 0.08 137);
+  }
+
+  .farm-process-card-top span {
+    color: var(--farm-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .farm-process-card h3,
+  .farm-role-card h3,
+  .farm-advice-grid h3 {
+    margin: 0 0 8px;
+    color: var(--farm-ink);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .farm-process-card p,
+  .farm-role-card p,
+  .farm-advice-grid p {
+    margin: 0;
+    color: var(--farm-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .farm-profiles-section {
+    border-block: 1px solid var(--farm-line);
+    background: color-mix(in oklab, var(--muted) 55%, var(--background));
+  }
+
+  .farm-profile-list {
+    display: grid;
+    gap: 0;
+    padding-block: 12px;
+  }
+
+  .farm-profile-row {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 26px;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--farm-line);
+    scroll-margin-top: 120px;
+  }
+
+  .farm-profile-row:last-child {
+    border-bottom: 0;
+  }
+
+  .farm-profile-row-index {
+    display: flex;
+    height: 46px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--farm-line);
+    color: oklch(46% 0.08 137);
+  }
+
+  .farm-profile-row-index span {
+    color: var(--farm-muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .farm-profile-row h2 {
+    margin: 8px 0;
+    font-size: clamp(24px, 3vw, 34px);
+  }
+
+  .farm-profile-copy {
+    max-width: 720px;
+    margin: 0 0 12px;
+    color: var(--farm-muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .farm-advice-grid,
+  .farm-process-grid,
+  .farm-role-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .farm-process-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .farm-advice-grid article,
+  .farm-process-card,
+  .farm-role-card {
+    padding: 19px;
+  }
+
+  .farm-advice-grid article > svg,
+  .farm-role-icon {
+    width: 38px;
+    height: 38px;
+    color: oklch(46% 0.08 137);
+  }
+
+  .farm-advice-grid h3,
+  .farm-role-card h3 {
+    margin-top: 17px;
+  }
+
+  .farm-advice-cta {
+    margin-top: 18px;
+  }
+
+  .farm-process-section {
+    padding-block: 58px;
+  }
+
+  .farm-process-card {
+    min-height: 190px;
+  }
+
+  .farm-process-card h3 {
+    margin-top: 20px;
+  }
+
+  .farm-role-card {
+    display: flex;
+    min-height: 220px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .farm-role-icon {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--muted);
+  }
+
+  .farm-role-card h3 {
+    margin-top: 15px;
+  }
+
+  .farm-role-card a {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 16px;
+    color: var(--farm-ink);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .agro-home .agro-delivery-section {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    align-items: center;
+    gap: 36px;
+    width: min(100%, var(--farm-container));
+    margin-inline: auto;
+    padding: 56px var(--farm-gutter);
+    border-top: 1px solid var(--farm-line);
+  }
+
+  .agro-home .agro-delivery-copy h2 {
+    color: var(--farm-ink);
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 650;
+    letter-spacing: -0.035em;
+  }
+
+  .agro-home .agro-delivery-copy > p:not(.agro-eyebrow) {
+    color: var(--farm-muted);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .agro-home .editorial-accent {
+    color: inherit;
+    font-family: inherit;
+    font-style: normal;
+  }
+
+  .farm-public-page .farm-public-hero + .farm-public-section,
+  .farm-listing-page {
+    padding-top: 48px;
+  }
+
+  .farm-about-intro {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr;
+    align-items: start;
+    gap: 48px;
+  }
+
+  .farm-about-intro > p,
+  .farm-about-facts-inner > div > p:not(.farm-eyebrow) {
+    margin: 6px 0 0;
+    color: var(--farm-muted);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .farm-about-roles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding-top: 0;
+  }
+
+  .farm-about-roles article {
+    padding: 20px;
+  }
+
+  .farm-about-roles article > span {
+    color: var(--farm-muted);
+    font-size: 12px;
+  }
+
+  .farm-about-roles h3 {
+    margin: 28px 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .farm-about-roles p {
+    margin: 0;
+    color: var(--farm-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .farm-about-facts {
+    border-block: 1px solid var(--farm-line);
+    background: color-mix(in oklab, var(--muted) 55%, var(--background));
+  }
+
+  .farm-about-facts-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .farm-about-facts-inner > div {
+    max-width: 620px;
+  }
+
+  .farm-about-facts-inner .farm-inline-link {
+    margin-top: 12px;
+  }
+
+  .farm-about-map-icon {
+    width: 90px;
+    height: 90px;
+    flex: none;
+    color: oklch(46% 0.08 137);
+    stroke-width: 1;
+  }
+
+  .farm-about-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .farm-about-cta h2 {
+    max-width: 690px;
+  }
+
+  .farm-contact-hero {
+    padding: 56px
+      max(
+        var(--farm-gutter),
+        calc((100vw - var(--farm-container)) / 2 + var(--farm-gutter))
+      );
+    background: oklch(18% 0.025 140);
+    color: white;
+  }
+
+  .farm-contact-hero .farm-eyebrow {
+    color: var(--primary);
+  }
+
+  .farm-contact-hero > p:last-child {
+    max-width: 660px;
+    margin: 15px 0 0;
+    color: rgb(255 255 255 / 85%);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .farm-contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 16px;
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    padding: 44px var(--farm-gutter) 64px;
+  }
+
+  .farm-contact-card {
+    padding: 24px;
+  }
+
+  .farm-contact-card h2 {
+    margin: 9px 0 18px;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .farm-contact-card .public-contacts {
+    margin-bottom: 18px;
+  }
+
+  .farm-contact-card ul {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .farm-contact-card li {
+    border-top: 1px solid var(--farm-line);
+  }
+
+  .farm-contact-card li a {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--farm-ink);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .farm-contact-loading {
+    color: var(--farm-muted);
+    font-size: 13px;
+  }
+
+  .farm-listing-page {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+    min-height: 50vh;
+    padding: 48px var(--farm-gutter) 72px;
+  }
+
+  .farm-listing-heading,
+  .farm-listing-content {
+    width: min(100%, var(--farm-container));
+    margin: 0 auto;
+  }
+
+  .farm-listing-heading {
+    margin-bottom: 28px;
+  }
+
+  .farm-listing-heading h1 {
+    max-width: 760px;
+    margin: 10px 0;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+
+  .farm-listing-heading > p:not(.farm-eyebrow) {
+    max-width: 700px;
+    margin: 0 0 10px;
+    color: var(--farm-muted);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .farm-category-loading {
+    min-height: 250px;
+  }
+
+  .farm-category-loading > span {
+    border-radius: var(--radius);
+    background: var(--muted);
+  }
+
+  .area-shell aside {
+    border-color: var(--farm-line);
+    background: var(--card);
+    color: var(--farm-ink);
+  }
+
+  .area-shell aside a[aria-current="page"] {
+    background: var(--muted);
+  }
+
+  .area-shell header,
+  .area-shell nav[aria-label="Navegação móvel"],
+  .area-shell nav[aria-label="Navegação do entregador"] {
+    border-color: var(--farm-line);
+    background: var(--card);
+  }
+
+  .area-shell main > * {
+    --radius: 0.65rem;
+  }
+
+  @media (max-width: 1000px) {
+    :root {
+      --farm-gutter: 24px;
+    }
+
+    .footer-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .farm-journey-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .farm-process-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .farm-role-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .farm-home-page .agro-benefits-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .farm-home-page .agro-benefit-card:nth-child(2) {
+      border-right: 0;
+    }
+
+    .farm-home-page .agro-benefit-card:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--farm-line);
+    }
+
+    .agro-home .landing-products,
+    .catalog-product-grid,
+    .favorites-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .storefront-navigation {
+      grid-template-columns: 76px minmax(180px, 1fr) auto;
+    }
+
+    .storefront-locale {
+      display: none;
+    }
+
+    .storefront-navigation > .storefront-account {
+      grid-column: 3;
+    }
+
+    .farm-contact-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    :root {
+      --farm-gutter: 20px;
+    }
+
+    .guide-ribbon {
+      justify-content: flex-start;
+      font-size: 10px;
+    }
+
+    .storefront-navigation {
+      grid-template-columns: 68px minmax(0, 1fr) auto;
+      gap: 8px 12px;
+      padding: 8px var(--farm-gutter);
+    }
+
+    .storefront-navigation > .brand-lockup {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .storefront-navigation > .storefront-header-search {
+      grid-column: 1 / 3;
+      grid-row: 2;
+    }
+
+    .storefront-navigation > .storefront-account {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .storefront-account {
+      gap: 8px;
+    }
+
+    .store-login,
+    .store-account-link,
+    .store-logout-button,
+    .store-favorites-link,
+    .store-cart-link {
+      min-width: 36px;
+    }
+
+    .storefront-header-search {
+      min-height: 44px;
+    }
+
+    .farm-home-page .agro-hero {
+      min-height: 25rem;
+    }
+
+    .farm-home-page .agro-hero-content {
+      width: min(100% - 2 * var(--farm-gutter), 680px);
+      padding-block: 42px;
+    }
+
+    .farm-home-page .agro-hero h1 {
+      font-size: clamp(36px, 9vw, 48px);
+    }
+
+    .farm-home-page .agro-hero-description {
+      font-size: 15px;
+    }
+
+    .farm-home-page .farm-home-search {
+      flex-wrap: wrap;
+      padding: 6px 8px;
+    }
+
+    .farm-home-page .farm-home-search > svg {
+      margin-left: 5px;
+    }
+
+    .farm-home-page .farm-home-search button {
+      width: 100%;
+    }
+
+    .farm-home-page .agro-benefits,
+    .farm-home-page .guide-section,
+    .farm-process-section,
+    .farm-roles-section {
+      width: min(100%, var(--farm-container));
+      padding-block: 42px;
+    }
+
+    .farm-home-page .agro-benefits {
+      padding-top: 14px;
+    }
+
+    .farm-home-page .agro-benefits-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .farm-home-page .agro-benefit-card {
+      min-height: 116px;
+      border-bottom: 1px solid var(--farm-line);
+      padding: 13px;
+    }
+
+    .farm-home-page .agro-benefit-card:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .farm-home-page .agro-benefit-card:nth-last-child(-n + 2) {
+      border-bottom: 0;
+    }
+
+    .farm-section-heading,
+    .agro-section-topline,
+    .farm-section-heading-copy {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agro-home .landing-categories {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agro-home .landing-products,
+    .catalog-product-grid,
+    .favorites-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .agro-home .agro-delivery-section {
+      grid-template-columns: 1fr;
+      gap: 18px;
+      padding-block: 42px;
+    }
+
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 25px 18px;
+    }
+
+    .footer-grid > div:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .catalog-page,
+    .product-detail-page,
+    .cart-page,
+    .favorites-page,
+    .farm-listing-page {
+      padding: 32px var(--farm-gutter) 52px;
+    }
+
+    .catalog-filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 14px;
+    }
+
+    .catalog-filter-search {
+      grid-column: 1 / -1;
+    }
+
+    .catalog-results-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .farm-public-hero {
+      min-height: 25rem;
+    }
+
+    .farm-public-hero-copy {
+      padding-block: 36px;
+    }
+
+    .farm-anchor-nav {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      gap: 18px;
+      padding: 0 var(--farm-gutter);
+      white-space: nowrap;
+    }
+
+    .farm-public-section {
+      padding-block: 42px;
+    }
+
+    .farm-process-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .farm-journey-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .farm-profile-row {
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 15px;
+      padding-block: 24px;
+    }
+
+    .farm-role-grid,
+    .farm-about-roles,
+    .farm-advice-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .farm-role-card {
+      min-height: 190px;
+    }
+
+    .farm-about-intro,
+    .farm-contact-grid {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .farm-about-roles {
+      padding-top: 0;
+    }
+
+    .farm-about-facts-inner,
+    .farm-about-cta {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .farm-about-map-icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    .farm-contact-hero {
+      padding: 40px var(--farm-gutter);
+    }
+
+    .auth-experience {
+      grid-template-columns: 1fr;
+    }
+
+    .auth-story {
+      display: none;
+    }
+
+    .auth-form-side header {
+      padding: 12px var(--farm-gutter);
+    }
+  }
+
+  @media (max-width: 420px) {
+    :root {
+      --farm-gutter: 16px;
+    }
+
+    .farm-home-page .agro-hero {
+      min-height: 25rem;
+    }
+
+    .farm-home-page .agro-hero-eyebrow {
+      align-items: flex-start;
+      font-size: 10px;
+    }
+
+    .farm-home-page .agro-hero h1 {
+      font-size: 36px;
+    }
+
+    .farm-home-page .agro-benefit-card {
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .farm-home-page .agro-benefit-card h2 {
+      font-size: 12px;
+    }
+
+    .farm-home-page .agro-benefit-card p {
+      font-size: 11px;
+    }
+
+    .farm-home-page .landing-categories {
+      gap: 9px;
+    }
+
+    .farm-home-page .landing-category {
+      min-height: 148px;
+    }
+
+    .farm-home-page .landing-category-content {
+      padding: 12px;
+    }
+
+    .agro-home .product-copy,
+    .catalog-product-copy {
+      padding: 12px;
+    }
+
+    .agro-home .product-copy h3,
+    .catalog-product-copy h2 {
+      font-size: 14px;
+    }
+
+    .farm-journey-copy h3 {
+      font-size: 15px;
+    }
+
+    .farm-journey-copy > p:last-child {
+      font-size: 13px;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-grid > div:first-child {
+      grid-column: auto;
+    }
+
+    .farm-contact-card {
+      padding: 18px;
+    }
+  }
+
+  .farm-categories-page .landing-category:hover {
+    transform: none;
+    border-color: color-mix(in oklab, var(--primary) 60%, var(--farm-line));
+    box-shadow: 0 8px 18px
+      color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+
+  .product-breadcrumb {
+    color: var(--farm-muted);
+  }
+
+  .product-breadcrumb a,
+  .product-detail-brand,
+  .product-detail-price > span:last-child,
+  .add-to-cart-price,
+  .product-related-section .catalog-results-heading > a {
+    color: color-mix(in oklab, var(--primary) 58%, var(--farm-ink));
+  }
+
+  .product-gallery-main,
+  .product-gallery-placeholder {
+    border-radius: var(--radius);
+    background: var(--muted);
+    color: var(--farm-muted);
+  }
+
+  .product-gallery-thumb {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+  }
+
+  .product-detail-title-row h1 {
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  .favorite-toggle,
+  .favorite-toggle-placeholder {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    color: var(--farm-ink);
+  }
+
+  .product-detail-price,
+  .product-detail-seller,
+  .add-to-cart-form label {
+    color: var(--farm-muted);
+  }
+
+  .product-detail-seller {
+    border-color: var(--farm-line);
+  }
+
+  .product-detail-seller strong {
+    color: var(--farm-ink);
+  }
+
+  .add-to-cart-form select,
+  .add-to-cart-form input {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--farm-ink);
+  }
+
+  .add-to-cart-form button,
+  .service-button {
+    border-color: var(--primary);
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    transition: background-color 150ms ease;
+  }
+
+  .add-to-cart-form button:hover,
+  .service-button:hover {
+    background: color-mix(in oklab, var(--primary) 86%, var(--foreground));
+  }
+
+  .product-trust-note,
+  .service-button.secondary {
+    border-radius: var(--radius);
+    background: var(--muted);
+    color: var(--farm-ink);
+  }
+
+  .product-description p,
+  .product-reviews article p:nth-child(2) {
+    color: var(--farm-muted);
+  }
+
+  .product-reviews article,
+  .cart-seller-group,
+  .cart-summary {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    box-shadow: none;
+  }
+
+  .customer-service-page {
+    width: min(100%, var(--farm-container));
+    margin-inline: auto;
+    padding: 42px var(--farm-gutter) 70px;
+  }
+
+  .service-page-header h1 {
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  .service-page-header > p:last-child,
+  .service-muted {
+    color: var(--farm-muted);
+  }
+
+  .support-workspace {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .support-sidebar {
+    border-color: var(--farm-line);
+    background: var(--muted);
+  }
+
+  .support-ticket-list button {
+    border-radius: var(--radius);
+  }
+
+  .support-ticket-list button:hover,
+  .support-ticket-list button[aria-pressed="true"] {
+    border-color: var(--farm-line);
+    background: var(--card);
+    box-shadow: none;
+  }
+
+  .support-ticket-list small,
+  .support-ticket-list button > span:not(.support-status) {
+    color: var(--farm-muted);
+  }
+
+  .support-chat-header,
+  .support-admin-status {
+    border-color: var(--farm-line);
+  }
+
+  .support-admin-status select,
+  .support-composer textarea {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--farm-ink);
+  }
+
+  .support-message-log {
+    background: var(--background);
+  }
+
+  .support-message {
+    border-radius: var(--radius);
+    background: var(--muted);
+  }
+
+  .support-message.message-own {
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .support-welcome,
+  .support-message strong {
+    color: var(--farm-muted);
+  }
+
+  .support-welcome h3 {
+    color: var(--farm-ink);
+    font-weight: 600;
+  }
+
+  .delivery-planner-controls select,
+  .map-selection-modes button,
+  .map-center-button {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--farm-ink);
+  }
+
+  .map-selection-modes button.active,
+  .map-center-button:hover {
+    background: var(--muted);
+    color: var(--farm-ink);
+  }
+
+  .route-summary,
+  .delivery-planner-map {
+    border-color: var(--farm-line);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+
+  @media (max-width: 1000px) {
+    .farm-categories-page .landing-categories {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .farm-categories-page .landing-categories {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .support-workspace {
+      grid-template-columns: 1fr;
+    }
+  }
+}

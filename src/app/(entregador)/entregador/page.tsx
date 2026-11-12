@@ -13,6 +13,7 @@ import { displayName } from "@/lib/display-name";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { ActionFeedbackForm } from "@/components/shared/action-feedback-form";
 import type { DeliveryStatus } from "@/generated/prisma/client";
 
 const labels: Partial<Record<DeliveryStatus, string>> = {
@@ -89,7 +90,11 @@ async function DriverHomeContent() {
                   : "Offline"}
             </p>
           </div>
-          <form action={toggleAvailabilityAction}>
+          <ActionFeedbackForm
+            action={toggleAvailabilityAction}
+            successMessage="Disponibilidade atualizada."
+            errorMessage="Não foi possível atualizar a disponibilidade. Tente novamente."
+          >
             <input
               type="hidden"
               name="available"
@@ -100,7 +105,7 @@ async function DriverHomeContent() {
                 ? "Ficar offline"
                 : "Ficar disponível"}
             </Button>
-          </form>
+          </ActionFeedbackForm>
         </div>
         <p className="text-muted-foreground col-span-2 text-xs">
           {pendingEarningsCount} entregas concluídas aguardam reconciliação.
@@ -164,10 +169,18 @@ async function DriverHomeContent() {
                   </a>
                 )}
               {nextStates[delivery.status]?.map((next) => (
-                <form
+                <ActionFeedbackForm
                   key={next}
                   action={deliveryTransitionAction}
                   className="space-y-2"
+                  successMessage={
+                    next === "DELIVERED"
+                      ? "Entrega confirmada."
+                      : next === "FAILED"
+                        ? "Falha da entrega registada."
+                        : "Estado da entrega atualizado."
+                  }
+                  errorMessage="Não foi possível atualizar a entrega. Verifique os dados e tente novamente."
                 >
                   <input type="hidden" name="id" value={delivery.id} />
                   <input type="hidden" name="status" value={next} />
@@ -178,6 +191,7 @@ async function DriverHomeContent() {
                       autoComplete="one-time-code"
                       minLength={6}
                       maxLength={6}
+                      pattern="[0-9]{6}"
                       placeholder="Código de confirmação do cliente"
                       required
                     />
@@ -188,6 +202,7 @@ async function DriverHomeContent() {
                       placeholder="Motivo da falha"
                       required
                       minLength={3}
+                      maxLength={500}
                     />
                   )}
                   <Button
@@ -202,7 +217,7 @@ async function DriverHomeContent() {
                       ? "Recusar entrega"
                       : (labels[next] ?? next)}
                   </Button>
-                </form>
+                </ActionFeedbackForm>
               ))}
               {delivery.statusHistory.length > 0 && (
                 <details className="text-sm">

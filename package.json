@@ -21,6 +21,7 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:seed:demo": "tsx prisma/seed/demo-catalog.ts",
+    "db:seed:featured-estimates": "tsx prisma/seed/featured-estimates.ts",
     "db:studio": "prisma studio",
     "worker:expire-reservations": "tsx src/worker/expire-reservations.ts",
     "db:up": "docker compose up -d",

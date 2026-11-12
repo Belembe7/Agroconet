@@ -1,94 +1,99 @@
 import Link from "next/link";
-import { ArrowUpRight, Sprout, Leaf, Truck, ShieldCheck } from "lucide-react";
-import { HeroFieldVideo } from "@/features/landing/hero-field-video";
+import Image from "next/image";
+import { ArrowRight, ArrowUpRight, Leaf, Search } from "lucide-react";
+import { FloatingLoginCard } from "@/features/landing/floating-login-card";
+import { RotatingHeroTitle } from "@/features/landing/rotating-hero-title";
 import type { SiteLocale } from "@/lib/locale";
 
 export function LandingHero({ locale }: { locale: SiteLocale }) {
   const english = locale === "en";
+
   return (
-    <>
-      <section className="guide-hero landing-hero" aria-labelledby="home-title">
-        <HeroFieldVideo />
-        <div className="hero-video-overlay" aria-hidden="true" />
-        <div className="hero-copy">
-          <div className="hero-intro-loop">
-            <p className="guide-eyebrow hero-reveal hero-reveal-1">
-              {english
-                ? "ROOTED IN THE LAND. GROWING FOR THE FUTURE."
-                : "DA TERRA. COM FUTURO."}
-            </p>
-            <h1 id="home-title" className="hero-title hero-title-single">
-              <span className="hero-title-line hero-title-line-highlight">
-                <span className="hero-highlight">
-                  {english ? "Everything you need" : "Tudo o que você precisa"}
-                  <svg
-                    viewBox="0 0 460 20"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                  >
-                    <path d="M4 14 Q210 -4 453 10" />
-                  </svg>
-                </span>
-              </span>
-              <span className="hero-title-line">
-                <span>
-                  {english
-                    ? "for your farm and livestock."
-                    : "para o seu campo de criação."}
-                </span>
-              </span>
-            </h1>
-            <p className="hero-description hero-reveal hero-reveal-5">
-              {english
-                ? "Every harvest starts with a choice. Find seeds, animal care and tools to take your farm further — and connect with sellers in one place."
-                : "Cada colheita começa com uma escolha. Encontre sementes, nutrição e ferramentas para levar o seu campo mais longe — e ligue-se a vendedores, num só lugar."}
-            </p>
+    <section className="agro-hero" aria-labelledby="home-title">
+      <Image
+        src="/images/agro-editorial.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="agro-hero-image"
+      />
+      <div className="agro-hero-shade" aria-hidden="true" />
+      <div className="agro-hero-layout">
+        <div className="agro-hero-content">
+          <p className="agro-hero-eyebrow">
+            <Leaf aria-hidden="true" className="size-4" />
+            {english
+              ? "AGRICULTURAL MARKETPLACE · MOZAMBIQUE"
+              : "MARKETPLACE AGROPECUÁRIO · MOÇAMBIQUE"}
+          </p>
+          <RotatingHeroTitle locale={locale} />
+          <p className="agro-hero-description">
+            {english
+              ? "Find agricultural supplies, compare available products and follow your order through local delivery."
+              : "Encontre insumos agropecuários, compare produtos disponíveis e acompanhe o seu pedido até à entrega local."}
+          </p>
+          <div className="agro-hero-actions">
+            <Link href="/registar" className="agro-button agro-button-lime">
+              {english ? "Create an account" : "Criar conta"}
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+            <Link href="/produtos" className="agro-button agro-button-ghost">
+              {english ? "Browse products" : "Explorar produtos"}
+            </Link>
           </div>
-          <Link
-            href="/produtos"
-            className="section-explore hero-reveal hero-reveal-7 mt-3"
-          >
-            {english ? "Browse all products" : "Ver todo o catálogo"}
-            <ArrowUpRight aria-hidden="true" className="size-4" />
-          </Link>
-          <div className="hero-location hero-reveal hero-reveal-8">
-            <span className="location-icon">
-              <Leaf aria-hidden="true" className="size-4" />
-            </span>
-            <div>
-              <strong>
-                {english
-                  ? "Local roots. Bigger ambitions."
-                  : "Raízes locais. Ambição maior."}
-              </strong>
-              <span>
-                {english
-                  ? "Delivery in Maputo and Matola, depending on your area."
-                  : "Entregas em Maputo e Matola, conforme a zona."}
-              </span>
-            </div>
-          </div>
+          <p className="agro-hero-location">
+            <span className="farm-location-dot" aria-hidden="true" />
+            {english
+              ? "Delivery coordinated in Maputo and Matola"
+              : "Entregas coordenadas em Maputo e Matola"}
+          </p>
         </div>
-      </section>
-      <div className="guide-promise-strip">
-        <span>
-          <Sprout aria-hidden="true" />
-          {english
-            ? "Solutions for every crop."
-            : "Soluções para cada cultivo."}
-        </span>
-        <span>
-          <Truck aria-hidden="true" />
-          {english ? "Logistics close to you." : "Logística perto de si."}
-        </span>
-        <span>
-          <ShieldCheck aria-hidden="true" />
-          {english ? "Verified sellers." : "Vendedores aprovados."}
-        </span>
-        <span className="promise-signature">
-          {english ? "This is how we grow." : "É assim que crescemos."}
-        </span>
+        <FloatingLoginCard locale={locale} />
       </div>
-    </>
+    </section>
+  );
+}
+
+export function LandingSearch({ locale }: { locale: SiteLocale }) {
+  const english = locale === "en";
+  return (
+    <section
+      className="home-search-section"
+      aria-label={english ? "Search marketplace" : "Pesquisar no marketplace"}
+    >
+      <div className="home-search-inner">
+        <div className="home-search-copy">
+          <p>{english ? "START HERE" : "COMECE POR AQUI"}</p>
+          <h2>
+            {english
+              ? "What do you need for your farm?"
+              : "O que precisa para o seu campo?"}
+          </h2>
+        </div>
+        <form action="/produtos" className="home-search-form" role="search">
+          <Search aria-hidden="true" className="size-5" />
+          <label htmlFor="home-search" className="sr-only">
+            {english
+              ? "Search products, brands and categories"
+              : "Pesquisar produtos, marcas e categorias"}
+          </label>
+          <input
+            id="home-search"
+            name="q"
+            maxLength={100}
+            placeholder={
+              english
+                ? "Search products, brands or categories"
+                : "Pesquisar produtos, marcas ou categorias"
+            }
+          />
+          <button type="submit">
+            {english ? "Search" : "Pesquisar"}
+            <ArrowUpRight aria-hidden="true" className="size-4" />
+          </button>
+        </form>
+      </div>
+    </section>
   );
 }

@@ -1,25 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { DM_Sans, Lora } from "next/font/google";
 import { env } from "@/lib/env";
 import { siteConfig } from "@/config/site";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import "./globals.css";
-
-const uiFont = DM_Sans({
-  display: "optional",
-  variable: "--font-ui",
-  subsets: ["latin"],
-});
-
-const brandFont = Lora({
-  display: "optional",
-  weight: "400",
-  style: "italic",
-  preload: false,
-  variable: "--font-brand",
-  subsets: ["latin"],
-});
+import "../features/landing/agro-home.css";
+import "../features/landing/farmbity.css";
 
 export const metadata: Metadata = {
   icons: { icon: "/icon.svg", apple: "/images/agroconet-logo.png" },
@@ -33,13 +20,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="pt"
-      className={`${uiFont.variable} ${brandFont.variable} h-full antialiased`}
-    >
+    <html lang="pt" className="h-full antialiased" suppressHydrationWarning>
       <body className="flex min-h-full flex-col">
-        {children}
-        <Toaster position="top-right" closeButton />
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-right" closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

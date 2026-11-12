@@ -12,13 +12,19 @@ export async function deliveryTransitionAction(formData: FormData) {
   const next = String(formData.get("status") ?? "") as DeliveryStatus;
   if (!Object.values(DeliveryStatus).includes(next))
     throw new Error("Estado inválido.");
+  const code = String(formData.get("code") ?? "").trim();
+  const note = String(formData.get("note") ?? "").trim();
+  if (next === "DELIVERED" && !/^\d{6}$/.test(code))
+    throw new Error("O código de confirmação deve ter 6 dígitos.");
+  if (next === "FAILED" && (note.length < 3 || note.length > 500))
+    throw new Error("Indique um motivo de falha entre 3 e 500 caracteres.");
   await new DeliveryService(prisma).transition(
     session.actor,
     String(formData.get("id") ?? ""),
     next,
     {
-      code: String(formData.get("code") ?? ""),
-      note: String(formData.get("note") ?? ""),
+      code,
+      note,
     },
   );
   revalidatePath("/entregador");
@@ -28,9 +34,12 @@ export async function deliveryTransitionAction(formData: FormData) {
 export async function toggleAvailabilityAction(formData: FormData) {
   const session = await getAppSession();
   if (!session) throw new Error("Sessão necessária.");
+  const available = String(formData.get("available") ?? "");
+  if (available !== "true" && available !== "false")
+    throw new Error("Disponibilidade inválida.");
   await new DeliveryService(prisma).toggleAvailability(
     session.actor,
-    formData.get("available") === "true",
+    available === "true",
   );
   revalidatePath("/entregador");
 }

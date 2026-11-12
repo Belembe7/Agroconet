@@ -113,6 +113,7 @@ export class LandingService {
         id: true,
         name: true,
         brand: true,
+        description: true,
         slug: true,
         category: { select: { name: true } },
         seller: { select: { businessName: true } },
@@ -149,6 +150,8 @@ export class LandingService {
           imageUrl: image ? publicImageUrl(image.storageKey) : null,
           imageAlt: image?.alt ? displayName(image.alt) : null,
           seller: displayName(product.seller.businessName),
+          estimated:
+            product.description?.startsWith("Dados estimados:") ?? false,
           label: displayName(variant.label),
           priceCents: variant.priceCents,
           available:

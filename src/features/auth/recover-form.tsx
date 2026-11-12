@@ -18,19 +18,28 @@ export function RecoverForm() {
     setError(null);
     setMessage(null);
 
-    const { error: requestError } = await authClient.requestPasswordReset({
-      email: email.trim().toLowerCase(),
-      redirectTo: "/redefinir",
-    });
+    try {
+      const { error: requestError } = await authClient.requestPasswordReset({
+        email: email.trim().toLowerCase(),
+        redirectTo: "/redefinir",
+      });
 
-    setPending(false);
-    if (requestError) {
-      setError(requestError.message ?? "Não foi possível pedir a recuperação.");
-      return;
+      if (requestError) {
+        setError(
+          requestError.message ?? "Não foi possível pedir a recuperação.",
+        );
+        return;
+      }
+      setMessage(
+        "Se existir uma conta associada a este email, receberá um link para redefinir a palavra-passe.",
+      );
+    } catch {
+      setError(
+        "Não foi possível pedir a recuperação. Verifique a ligação e tente novamente.",
+      );
+    } finally {
+      setPending(false);
     }
-    setMessage(
-      "Se existir uma conta associada a este email, receberá um link para redefinir a palavra-passe.",
-    );
   }
 
   return (
@@ -38,13 +47,27 @@ export function RecoverForm() {
       <AuthField
         label="Email da conta"
         value={email}
-        onChange={setEmail}
+        onChange={(value) => {
+          setEmail(value);
+          setError(null);
+          setMessage(null);
+        }}
         type="email"
         autoComplete="email"
       />
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-red-700">
+          {error}
+        </p>
+      ) : null}
       {message ? (
-        <p className="text-muted-foreground text-sm">{message}</p>
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-muted-foreground text-sm"
+        >
+          {message}
+        </p>
       ) : null}
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "A enviar…" : "Enviar link de recuperação"}

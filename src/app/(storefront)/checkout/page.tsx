@@ -5,13 +5,18 @@ import { prisma } from "@/lib/db";
 import { getCurrentCartSnapshot } from "@/features/cart/server";
 import { CheckoutService } from "@/services/checkout/checkout-service";
 import { placeOrderAction } from "@/features/checkout/actions";
+import { CheckoutSubmitButton } from "@/features/checkout/checkout-submit-button";
 import { PriceTag } from "@/components/shared/price-tag";
 import { randomUUID } from "node:crypto";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { displayName } from "@/lib/display-name";
 
-export default function CheckoutPage() {
+export default function CheckoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string | string[] }>;
+}) {
   return (
     <Suspense
       fallback={
@@ -20,13 +25,21 @@ export default function CheckoutPage() {
         </main>
       }
     >
-      <CheckoutContent />
+      <CheckoutContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function CheckoutContent() {
+async function CheckoutContent({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string | string[] }>;
+}) {
   await connection();
+  const params = await searchParams;
+  const checkoutError = Array.isArray(params.erro)
+    ? params.erro[0]
+    : params.erro;
   const session = await getAppSession();
   if (!session?.actor.roles.includes("CUSTOMER"))
     redirect("/entrar?next=%2Fcheckout");
@@ -37,6 +50,16 @@ async function CheckoutContent() {
   if (!cart.itemCount) redirect("/carrinho");
   return (
     <main className="mx-auto max-w-5xl space-y-8 px-4 py-12">
+      {checkoutError === "dados" || checkoutError === "pedido" ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        >
+          {checkoutError === "dados"
+            ? "Escolha uma morada e uma forma de pagamento válidas antes de submeter o pedido."
+            : "O pedido não foi concluído. Verifique o carrinho e tente novamente."}
+        </p>
+      ) : null}
       <header>
         <p className="guide-eyebrow">FINALIZAR COMPRA</p>
         <h1 className="text-4xl font-semibold">Entrega e pagamento</h1>
@@ -106,12 +129,7 @@ async function CheckoutContent() {
             <p className="text-muted-foreground text-sm">
               Pagamento na entrega, com confirmação manual pelo entregador.
             </p>
-            <button
-              className="bg-primary rounded-full px-6 py-3 font-semibold"
-              type="submit"
-            >
-              Submeter pedido
-            </button>
+            <CheckoutSubmitButton />
           </form>
           <aside className="h-fit rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">Resumo</h2>

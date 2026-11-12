@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
 import { displayDescription, displayName } from "@/lib/display-name";
@@ -11,6 +12,7 @@ import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo
 import { productImageAsset } from "@/lib/product-image";
 import { prisma } from "@/lib/db";
 import { requireAreaSession } from "@/lib/session";
+import { ActionFeedbackForm } from "@/components/shared/action-feedback-form";
 import { SellerService } from "@/services/seller/seller-service";
 import {
   adjustSellerStockAction,
@@ -184,9 +186,11 @@ async function VendedorHomeContent() {
           </p>
         </CardHeader>
         <CardContent>
-          <form
+          <ActionFeedbackForm
             action={updateSellerProfileAction}
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            successMessage="Perfil comercial guardado."
+            errorMessage="Não foi possível guardar o perfil. Verifique os campos e tente novamente."
           >
             <Field label="Nome comercial">
               <input
@@ -202,13 +206,16 @@ async function VendedorHomeContent() {
                 className={inputClass}
                 name="legalName"
                 defaultValue={data.seller.legalName ?? ""}
+                maxLength={160}
               />
             </Field>
             <Field label="Telefone">
               <input
                 className={inputClass}
                 name="phone"
+                type="tel"
                 defaultValue={data.seller.phone}
+                minLength={7}
                 maxLength={32}
                 required
               />
@@ -250,7 +257,7 @@ async function VendedorHomeContent() {
                 Guardar perfil
               </Button>
             </div>
-          </form>
+          </ActionFeedbackForm>
         </CardContent>
       </Card>
 
@@ -263,9 +270,11 @@ async function VendedorHomeContent() {
         </CardHeader>
         <CardContent>
           {categories.length ? (
-            <form
+            <ActionFeedbackForm
               action={createSellerProductAction}
               className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              successMessage="Produto enviado para revisão."
+              errorMessage="Não foi possível criar o produto. Verifique os dados e tente novamente."
             >
               <Field label="Nome do produto">
                 <input
@@ -308,6 +317,7 @@ async function VendedorHomeContent() {
                   className={inputClass}
                   name="label"
                   placeholder="Ex.: Embalagem 1 litro"
+                  maxLength={120}
                   required
                 />
               </Field>
@@ -329,9 +339,8 @@ async function VendedorHomeContent() {
                 </select>
               </Field>
               <Field label="Tamanho da unidade">
-                <input
+                <NumericInput
                   className={inputClass}
-                  type="number"
                   name="unitSize"
                   min="0.0001"
                   step="0.0001"
@@ -340,9 +349,8 @@ async function VendedorHomeContent() {
                 />
               </Field>
               <Field label="Preço (Mzn)">
-                <input
+                <NumericInput
                   className={inputClass}
-                  type="number"
                   name="price"
                   min="0.01"
                   step="0.01"
@@ -350,9 +358,8 @@ async function VendedorHomeContent() {
                 />
               </Field>
               <Field label="Stock inicial">
-                <input
+                <NumericInput
                   className={inputClass}
-                  type="number"
                   name="stock"
                   min="0"
                   step="1"
@@ -363,7 +370,7 @@ async function VendedorHomeContent() {
               <div className="flex items-end">
                 <Button type="submit">Enviar para revisão</Button>
               </div>
-            </form>
+            </ActionFeedbackForm>
           ) : (
             <p className="text-muted-foreground text-sm">
               Ainda não há categorias disponíveis. Peça à equipa para configurar
@@ -439,9 +446,11 @@ async function VendedorHomeContent() {
                                 reservadas)
                               </p>
                             </div>
-                            <form
+                            <ActionFeedbackForm
                               action={adjustSellerStockAction}
                               className="flex flex-wrap items-center gap-2"
+                              successMessage="Stock ajustado."
+                              errorMessage="Não foi possível ajustar o stock. Verifique o valor e tente novamente."
                             >
                               <input
                                 type="hidden"
@@ -455,12 +464,13 @@ async function VendedorHomeContent() {
                                 Ajuste de stock para{" "}
                                 {displayName(variant.label)}
                               </label>
-                              <input
+                              <NumericInput
                                 id={`stock-${variant.id}`}
                                 className={`${inputClass} w-28`}
                                 aria-label="Ajuste de stock (+ entrada, − saída)"
-                                type="number"
                                 name="quantity"
+                                min="-100000"
+                                max="100000"
                                 step="1"
                                 required
                                 placeholder="± quantidade"
@@ -475,16 +485,18 @@ async function VendedorHomeContent() {
                               <Button type="submit" variant="outline" size="sm">
                                 Ajustar stock
                               </Button>
-                            </form>
+                            </ActionFeedbackForm>
                           </div>
                           {index === 0 && (
                             <details className="mt-3">
                               <summary className="text-primary cursor-pointer text-sm underline">
                                 Editar dados do produto
                               </summary>
-                              <form
+                              <ActionFeedbackForm
                                 action={updateSellerProductAction}
                                 className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                                successMessage="Produto atualizado e reenviado para revisão."
+                                errorMessage="Não foi possível atualizar o produto. Verifique os campos e tente novamente."
                               >
                                 <input
                                   type="hidden"
@@ -554,14 +566,14 @@ async function VendedorHomeContent() {
                                     className={inputClass}
                                     name="label"
                                     defaultValue={displayName(variant.label)}
+                                    maxLength={120}
                                     required
                                   />
                                 </Field>
                                 <Field label="Preço (Mzn)">
-                                  <input
+                                  <NumericInput
                                     className={inputClass}
                                     name="price"
-                                    type="number"
                                     defaultValue={(
                                       variant.priceCents / 100
                                     ).toFixed(2)}
@@ -575,7 +587,7 @@ async function VendedorHomeContent() {
                                     Guardar e reenviar para revisão
                                   </Button>
                                 </div>
-                              </form>
+                              </ActionFeedbackForm>
                             </details>
                           )}
                         </div>
@@ -642,14 +654,20 @@ async function VendedorHomeContent() {
                   </p>
                   {order.status === "PENDING" && (
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <form action={updateSellerOrderAction}>
+                      <ActionFeedbackForm
+                        action={updateSellerOrderAction}
+                        successMessage="Encomenda confirmada."
+                        errorMessage="Não foi possível confirmar a encomenda. Atualize o painel e tente novamente."
+                      >
                         <input type="hidden" name="orderId" value={order.id} />
                         <input type="hidden" name="next" value="CONFIRMED" />
                         <Button type="submit">Confirmar encomenda</Button>
-                      </form>
-                      <form
+                      </ActionFeedbackForm>
+                      <ActionFeedbackForm
                         action={updateSellerOrderAction}
                         className="flex gap-2"
+                        successMessage="Encomenda recusada."
+                        errorMessage="Não foi possível recusar a encomenda. Verifique o estado e tente novamente."
                       >
                         <input type="hidden" name="orderId" value={order.id} />
                         <input type="hidden" name="next" value="REJECTED" />
@@ -663,11 +681,16 @@ async function VendedorHomeContent() {
                         <Button type="submit" variant="outline">
                           Recusar
                         </Button>
-                      </form>
+                      </ActionFeedbackForm>
                     </div>
                   )}
                   {order.status === "CONFIRMED" && (
-                    <form action={updateSellerOrderAction} className="mt-4">
+                    <ActionFeedbackForm
+                      action={updateSellerOrderAction}
+                      className="mt-4"
+                      successMessage="Encomenda marcada como pronta para recolha."
+                      errorMessage="Não foi possível atualizar a encomenda. Atualize o painel e tente novamente."
+                    >
                       <input type="hidden" name="orderId" value={order.id} />
                       <input
                         type="hidden"
@@ -677,7 +700,7 @@ async function VendedorHomeContent() {
                       <Button type="submit" variant="outline">
                         Marcar pronta para recolha
                       </Button>
-                    </form>
+                    </ActionFeedbackForm>
                   )}
                 </CardContent>
               </Card>

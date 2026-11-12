@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { PriceTag } from "@/components/shared/price-tag";
 import { addToCartAction } from "@/features/cart/actions";
 
@@ -36,7 +37,10 @@ export function AddToCartForm({
   const available = selected?.available ?? 0;
 
   useEffect(() => {
-    if (state?.ok) router.refresh();
+    if (state?.ok) {
+      window.dispatchEvent(new Event("agroconet:cart-added"));
+      router.refresh();
+    }
   }, [router, state]);
 
   if (!variants.length)
@@ -75,10 +79,9 @@ export function AddToCartForm({
         </p>
       ) : null}
       <label htmlFor="product-quantity">Quantidade</label>
-      <input
+      <NumericInput
         id="product-quantity"
         name="quantity"
-        type="number"
         min="1"
         max={Math.min(99, available || 1)}
         defaultValue="1"
