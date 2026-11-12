@@ -207,6 +207,12 @@ export async function LandingHighlights({
         <div className="landing-products">
           {products.map((product) => {
             const productFallbackImage = productImageAsset(product.name);
+            const isSeedPackagePhoto =
+              productFallbackImage?.src.endsWith(".png") ?? false;
+            const usesPackagingPhoto = product.estimated || isSeedPackagePhoto;
+            const imageUrl = isSeedPackagePhoto
+              ? (productFallbackImage?.src ?? product.imageUrl)
+              : product.imageUrl;
             return (
               <Link
                 prefetch={false}
@@ -217,20 +223,20 @@ export async function LandingHighlights({
                 <article className="landing-product">
                   <div
                     className={
-                      product.estimated
+                      usesPackagingPhoto
                         ? "product-visual product-visual-packaging"
                         : "product-visual"
                     }
                   >
-                    {product.imageUrl ? (
+                    {imageUrl ? (
                       <Image
-                        src={product.imageUrl}
+                        src={imageUrl}
                         alt={product.imageAlt || product.name}
                         fill
                         sizes="(max-width: 760px) 50vw, 25vw"
-                        unoptimized={/^https?:\/\//.test(product.imageUrl)}
+                        unoptimized={/^https?:\/\//.test(imageUrl)}
                         className={
-                          product.estimated
+                          usesPackagingPhoto
                             ? "product-packaging-photo object-contain"
                             : "object-cover"
                         }

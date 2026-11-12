@@ -172,7 +172,7 @@ const marketplacePaths = [
     title: "Explore produtos e marcas",
     description: "Pesquise no catálogo e compare as opções publicadas.",
     href: "/produtos",
-    image: "/images/products/semente-tomate-f1-anaya.webp",
+    image: "/images/products/semente-tomate-f1-anaya.png",
     imageAlt: "Embalagem de sementes de tomate",
   },
   {

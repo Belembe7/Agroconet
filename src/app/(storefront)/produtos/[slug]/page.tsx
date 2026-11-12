@@ -85,8 +85,13 @@ async function ProductContent({ params }: Props) {
   if (product.slug !== slug)
     permanentRedirect(`/produtos/${encodeURIComponent(product.slug)}`);
   const fallbackImage = productImageAsset(product.name);
+  const isSeedPackagePhoto = fallbackImage?.src.endsWith(".png") ?? false;
   const estimated =
     product.description?.startsWith("Dados estimados:") ?? false;
+  const mainImage = isSeedPackagePhoto
+    ? (fallbackImage?.src ?? product.images[0]?.url)
+    : product.images[0]?.url;
+  const usesPackagingPhoto = estimated || isSeedPackagePhoto;
 
   const schema = {
     "@context": "https://schema.org",
@@ -96,7 +101,9 @@ async function ProductContent({ params }: Props) {
     brand: product.brand
       ? { "@type": "Brand", name: product.brand }
       : undefined,
-    image: product.images.length
+    image: mainImage
+      ? [mainImage]
+      : product.images.length
       ? product.images.map((image) => image.url)
       : undefined,
     category: product.category.name,
@@ -149,19 +156,19 @@ async function ProductContent({ params }: Props) {
       </nav>
       <section className="product-detail-grid">
         <div className="product-gallery" aria-label="Imagens do produto">
-          {product.images[0]?.url ? (
+          {mainImage ? (
             <div
-              className={`product-gallery-main${estimated ? "product-gallery-main-packaging" : ""}`}
+              className={`product-gallery-main${usesPackagingPhoto ? " product-gallery-main-packaging" : ""}`}
             >
               <Image
-                src={product.images[0].url}
-                alt={product.images[0].alt || product.name}
+                src={mainImage}
+                alt={product.images[0]?.alt || product.name}
                 fill
                 priority
                 sizes="(max-width: 800px) 100vw, 50vw"
-                unoptimized={/^https?:\/\//.test(product.images[0].url)}
+                unoptimized={/^https?:\/\//.test(mainImage)}
                 className={
-                  estimated
+                  usesPackagingPhoto
                     ? "product-packaging-detail-photo object-contain"
                     : ""
                 }
@@ -182,7 +189,7 @@ async function ProductContent({ params }: Props) {
               <span>Fotografia em breve</span>
             </div>
           )}
-          {product.images.length > 1 ? (
+          {!isSeedPackagePhoto && product.images.length > 1 ? (
             <div className="product-gallery-thumbnails">
               {product.images.slice(1, 5).map((image, index) => (
                 <div

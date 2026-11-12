@@ -12,8 +12,21 @@ const tile = (sheet: number, position: TilePosition): ProductImageAsset => ({
   position,
 });
 
+const transparentSeedPackages = new Set([
+  "semente-cebola-soli",
+  "semente-cebola-red-creole",
+  "semente-quiabo-clemson-spineless",
+  "semente-melancia-f1-thor",
+  "semente-tomate-f1-anaya",
+  "semente-beterraba-crimson-globe",
+  "semente-repolho-red-ball-2",
+  "semente-salsa-commun-2",
+]);
+
 const photo = (filename: string): ProductImageAsset => ({
-  src: `/images/products/${filename}.webp`,
+  src: `/images/products/${filename}.${
+    transparentSeedPackages.has(filename) ? "png" : "webp"
+  }`,
 });
 
 // Each entry points to a distinct product photograph or a distinct sheet tile.

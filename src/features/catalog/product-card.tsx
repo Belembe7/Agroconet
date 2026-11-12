@@ -8,6 +8,11 @@ import type { CatalogProductCard } from "@/services/catalog/catalog-service";
 
 export function ProductCard({ product }: { product: CatalogProductCard }) {
   const productFallbackImage = productImageAsset(product.name);
+  const isSeedPackagePhoto = productFallbackImage?.src.endsWith(".png") ?? false;
+  const usesPackagingPhoto = product.estimated || isSeedPackagePhoto;
+  const imageUrl = isSeedPackagePhoto
+    ? (productFallbackImage?.src ?? product.imageUrl)
+    : product.imageUrl;
 
   return (
     <Link
@@ -17,20 +22,20 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
     >
       <div
         className={
-          product.estimated
+          usesPackagingPhoto
             ? "catalog-product-image catalog-product-image-packaging"
             : "catalog-product-image"
         }
       >
-        {product.imageUrl ? (
+        {imageUrl ? (
           <Image
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.imageAlt || product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            unoptimized={/^https?:\/\//.test(product.imageUrl)}
+            unoptimized={/^https?:\/\//.test(imageUrl)}
             className={
-              product.estimated
+              usesPackagingPhoto
                 ? "product-packaging-photo object-contain"
                 : "object-cover"
             }
