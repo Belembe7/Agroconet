@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && tsx scripts/seed-featured-estimates-vercel.ts && next build",
+    "build": "prisma migrate deploy && node scripts/seed-featured-estimates-vercel.mjs && next build",
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint .",
