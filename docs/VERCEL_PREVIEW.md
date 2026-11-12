@@ -21,7 +21,7 @@ Este roteiro publica uma **prévia de avaliação** do estado atual do Agroconet
 
 Como `NEXT_PUBLIC_APP_URL` é pública, não coloque segredos em variáveis `NEXT_PUBLIC_*`. As duas variáveis obrigatórias para o servidor são `DATABASE_URL` e `BETTER_AUTH_SECRET`; uma URL PostgreSQL local não funciona na Vercel.
 
-Para apresentar as oito sementes com valores estimados, adicione `AGROCONET_LOAD_ESTIMATED_FEATURED=1` apenas ao ambiente Vercel que deve receber esses produtos (`Preview` ou `Production`). O build carrega os produtos de forma idempotente somente nesse ambiente quando a variável está activa. Use uma base de dados separada para `Preview`. Em `Production`, também é necessário definir `AGROCONET_ALLOW_ESTIMATED_FEATURED_PRODUCTION=1` para confirmar que os valores estimados devem aparecer no domínio de produção.
+O build da Vercel carrega as oito sementes com valores estimados em `Preview` e `Production`, de forma idempotente. O seed completo de demonstração não é executado. Use uma base de dados separada para `Preview`; a base associada ao ambiente selecionado recebe os oito produtos estimados.
 
 Se o build indicar `Invalid environment variables`, verifique em **Settings → Environment Variables** se as variáveis obrigatórias existem no ambiente do deploy que falhou. Guarde as alterações e publique um novo deploy com o commit mais recente. Não use `SKIP_ENV_VALIDATION` para esconder a falta de configuração.
 
