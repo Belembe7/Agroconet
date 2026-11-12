@@ -6,7 +6,7 @@ import { saveAddressAction } from "@/features/customer/actions";
 const fields = [
   { name: "label", label: "Nome da morada" },
   { name: "recipientName", label: "Destinatário" },
-  { name: "phone", label: "Telefone", type: "tel" },
+  { name: "phone", label: "Telefone" },
   { name: "province", label: "Província" },
   { name: "district", label: "Distrito" },
   { name: "neighborhood", label: "Bairro / localidade" },
@@ -35,7 +35,7 @@ export function AddressForm() {
           <input
             className="rounded-lg border px-3"
             name={name}
-            type={field.type ?? "text"}
+            type={name === "phone" ? "tel" : "text"}
             autoComplete={
               name === "recipientName"
                 ? "name"
