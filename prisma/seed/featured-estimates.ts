@@ -6,9 +6,18 @@ import {
   ProductUnit,
 } from "../../src/generated/prisma/client";
 
-if (process.env.NODE_ENV === "production") {
+const explicitVercelOptIn =
+  process.env.VERCEL === "1" &&
+  process.env.AGROCONET_LOAD_ESTIMATED_FEATURED === "1";
+const enabledForVercelEnvironment =
+  explicitVercelOptIn &&
+  (process.env.VERCEL_ENV === "preview" ||
+    (process.env.VERCEL_ENV === "production" &&
+      process.env.AGROCONET_ALLOW_ESTIMATED_FEATURED_PRODUCTION === "1"));
+
+if (process.env.NODE_ENV === "production" && !enabledForVercelEnvironment) {
   throw new Error(
-    "Estimated featured products must never be loaded in production",
+    "Estimated featured products require explicit opt-in for Vercel Preview or Production",
   );
 }
 if (process.env.AGROCONET_LOAD_ESTIMATED_FEATURED !== "1") {
@@ -24,9 +33,10 @@ if (
   !["localhost", "127.0.0.1", "::1", "host.docker.internal"].includes(
     databaseUrl.hostname,
   )
+  && !enabledForVercelEnvironment
 ) {
   throw new Error(
-    "Estimated products can only be loaded into a local database.",
+    "Estimated products can only be loaded locally or in an explicitly enabled Vercel environment.",
   );
 }
 
