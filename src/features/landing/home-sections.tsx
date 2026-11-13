@@ -7,6 +7,7 @@ import {
   MapPin,
   MessageCircle,
   PackageSearch,
+  Sprout,
   Truck,
   UserRound,
 } from "lucide-react";
