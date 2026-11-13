@@ -1,16 +1,10 @@
 import Link from "next/link";
 import { ArrowUpRight, Menu, UserRound } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
+import { defaultAreaPathForRoles } from "@/lib/area-access";
 import { getAppSession } from "@/lib/session";
 
 type NavigationLink = { href: string; label: string };
-
-function accountPath(roles: string[]) {
-  if (roles.includes("SUPER_ADMIN") || roles.includes("ADMIN")) return "/admin";
-  if (roles.includes("SELLER")) return "/vendedor";
-  if (roles.includes("DRIVER")) return "/entregador";
-  return "/cliente";
-}
 
 export async function StorefrontAuthLinks({
   links,
@@ -20,7 +14,9 @@ export async function StorefrontAuthLinks({
   locale: "pt" | "en";
 }) {
   const session = await getAppSession();
-  const destination = session ? accountPath(session.actor.roles) : null;
+  const destination = session
+    ? defaultAreaPathForRoles(session.actor.roles)
+    : null;
   const firstName =
     session?.user.name.trim().split(/\s+/)[0] ||
     (locale === "en" ? "Account" : "Conta");

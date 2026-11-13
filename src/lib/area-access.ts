@@ -40,6 +40,14 @@ export function canAccessArea(actor: Actor, area: AppArea): boolean {
   return actor.roles.some((role) => allowed.includes(role));
 }
 
+export function defaultAreaPathForRoles(roles: readonly Role[]): string {
+  if (roles.includes("SUPER_ADMIN") || roles.includes("ADMIN"))
+    return AREA_PATH_PREFIX.admin;
+  if (roles.includes("SELLER")) return AREA_PATH_PREFIX.vendedor;
+  if (roles.includes("DRIVER")) return AREA_PATH_PREFIX.entregador;
+  return AREA_PATH_PREFIX.cliente;
+}
+
 /**
  * Only same-origin relative paths. Blocks open redirects (`//evil`, `https://…`).
  */

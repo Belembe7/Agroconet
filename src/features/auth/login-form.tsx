@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { getPostLoginPathAction } from "@/features/auth/actions";
 import { AuthField } from "@/features/auth/field";
 import { safeInternalPath } from "@/lib/area-access";
 import { authClient } from "@/lib/auth-client";
@@ -21,7 +22,8 @@ export function LoginForm({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = safeInternalPath(searchParams.get("next"));
+  const requestedNext = searchParams.get("next");
+  const nextPath = requestedNext ? safeInternalPath(requestedNext, "") : "";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,7 +52,8 @@ export function LoginForm({
       const cartResult = await mergeGuestCartAfterLogin();
       if (!cartResult.ok) toast.info(cartResult.error);
       toast.success("Login feito com sucesso.");
-      router.replace(nextPath);
+      const destination = nextPath || (await getPostLoginPathAction());
+      router.replace(destination);
       router.refresh();
     } catch {
       setError(
