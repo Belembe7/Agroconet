@@ -1496,11 +1496,11 @@
   }
 
   .desktop-store-nav {
-    display: flex;
+    display: none;
   }
 
   .mobile-store-menu {
-    display: none;
+    display: block;
   }
 }
 
