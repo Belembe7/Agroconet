@@ -7,6 +7,11 @@ import {
 } from "@/generated/prisma/client";
 import type { Actor } from "@/lib/permissions";
 import { assertCan } from "@/lib/permissions";
+import {
+  realDeliveryWhere,
+  realDeliveryZoneWhere,
+  realDriverWhere,
+} from "@/lib/real-data-filters";
 import { AuditService } from "@/services/audit/audit-service";
 import { InventoryService } from "@/services/inventory/inventory-service";
 
@@ -112,8 +117,13 @@ export class DeliveryService {
     const [deliveries, drivers, zones] = await Promise.all([
       this.db.delivery.findMany({
         where: {
-          status: { in: ["UNASSIGNED", "FAILED"] },
-          sellerOrder: { status: "READY_FOR_PICKUP" },
+          AND: [
+            {
+              status: { in: ["UNASSIGNED", "FAILED"] },
+              sellerOrder: { status: "READY_FOR_PICKUP" },
+            },
+            realDeliveryWhere,
+          ],
         },
         orderBy: { createdAt: "asc" },
         take: 50,
@@ -133,7 +143,12 @@ export class DeliveryService {
         },
       }),
       this.db.driver.findMany({
-        where: { status: "ACTIVE", availability: "AVAILABLE", deletedAt: null },
+        where: {
+          AND: [
+            { status: "ACTIVE", availability: "AVAILABLE" },
+            realDriverWhere,
+          ],
+        },
         orderBy: { createdAt: "asc" },
         select: {
           id: true,
@@ -143,7 +158,7 @@ export class DeliveryService {
         },
       }),
       this.db.deliveryZone.findMany({
-        where: { isActive: true },
+        where: realDeliveryZoneWhere,
         orderBy: { name: "asc" },
         select: {
           id: true,

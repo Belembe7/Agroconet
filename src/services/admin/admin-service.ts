@@ -1,6 +1,15 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import type { Actor } from "@/lib/permissions";
 import { assertCan } from "@/lib/permissions";
+import {
+  realAuditLogWhere,
+  realCategoryWhere,
+  realDeliveryWhere,
+  realDriverWhere,
+  realOrderWhere,
+  realProductWhere,
+  realSellerWhere,
+} from "@/lib/real-data-filters";
 import { AuditService } from "@/services/audit/audit-service";
 
 export class AdminService {
@@ -24,16 +33,19 @@ export class AdminService {
       pendingSellers,
       pendingProducts,
     ] = await Promise.all([
-      this.db.order.count(),
-      this.db.seller.count({ where: { deletedAt: null } }),
-      this.db.product.count({ where: { deletedAt: null } }),
-      this.db.driver.count({ where: { deletedAt: null } }),
-      this.db.delivery.count(),
+      this.db.order.count({ where: realOrderWhere }),
+      this.db.seller.count({
+        where: { AND: [{ deletedAt: null }, realSellerWhere] },
+      }),
+      this.db.product.count({ where: realProductWhere }),
+      this.db.driver.count({ where: realDriverWhere }),
+      this.db.delivery.count({ where: realDeliveryWhere }),
       this.db.payment.aggregate({
-        where: { status: "PAID" },
+        where: { status: "PAID", order: { is: realOrderWhere } },
         _sum: { amountCents: true },
       }),
       this.db.order.findMany({
+        where: realOrderWhere,
         take: 8,
         orderBy: { createdAt: "desc" },
         select: {
@@ -46,7 +58,9 @@ export class AdminService {
         },
       }),
       this.db.seller.findMany({
-        where: { status: "PENDING", deletedAt: null },
+        where: {
+          AND: [{ status: "PENDING", deletedAt: null }, realSellerWhere],
+        },
         take: 8,
         orderBy: { createdAt: "asc" },
         select: {
@@ -58,7 +72,9 @@ export class AdminService {
         },
       }),
       this.db.product.findMany({
-        where: { status: "PENDING_REVIEW", deletedAt: null },
+        where: {
+          AND: [{ status: "PENDING_REVIEW" }, realProductWhere],
+        },
         take: 8,
         orderBy: { createdAt: "asc" },
         select: {
@@ -168,7 +184,7 @@ export class AdminService {
     this.authorize(actor);
     const [categories, drivers, settings, auditLogs] = await Promise.all([
       this.db.category.findMany({
-        where: { deletedAt: null },
+        where: realCategoryWhere,
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
         select: {
           id: true,
@@ -179,7 +195,7 @@ export class AdminService {
         },
       }),
       this.db.driver.findMany({
-        where: { deletedAt: null },
+        where: realDriverWhere,
         orderBy: { createdAt: "desc" },
         take: 20,
         select: {
@@ -196,6 +212,7 @@ export class AdminService {
         select: { key: true, value: true, description: true, updatedAt: true },
       }),
       this.db.auditLog.findMany({
+        where: realAuditLogWhere,
         orderBy: { createdAt: "desc" },
         take: 20,
         select: {

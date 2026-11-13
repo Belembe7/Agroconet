@@ -3,6 +3,7 @@ import { createHash, randomInt } from "node:crypto";
 import type { PrismaClient, Prisma } from "@/generated/prisma/client";
 import type { Actor } from "@/lib/permissions";
 import { CustomerApiError } from "@/lib/customer-api-error";
+import { realDeliveryWhere } from "@/lib/real-data-filters";
 import {
   editableDeliveryStates,
   hasActiveRoute,
@@ -16,7 +17,7 @@ export const mapPointSchema = z.object({
 });
 export function deliveryMapScope(actor: Actor): Prisma.DeliveryWhereInput {
   if (actor.roles.some((role) => role === "ADMIN" || role === "SUPER_ADMIN"))
-    return {};
+    return realDeliveryWhere;
   return {
     OR: [
       { sellerOrder: { order: { userId: actor.userId } } },
