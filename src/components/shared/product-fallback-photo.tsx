@@ -14,26 +14,10 @@ export function ProductFallbackPhoto({
   className?: string;
   priority?: boolean;
 }) {
-  if (asset.position) {
-    return (
-      <div
-        role="img"
-        aria-label={`Imagem ilustrativa de ${name}`}
-        className={`absolute inset-0 bg-[#f6f0e5] ${className ?? ""}`}
-        style={{
-          backgroundImage: `url('${asset.src}')`,
-          backgroundPosition: asset.position,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "200% 200%",
-        }}
-      />
-    );
-  }
-
   return (
     <Image
       src={asset.src}
-      alt={`Imagem ilustrativa de ${name}`}
+      alt={name}
       fill
       sizes={sizes}
       className={className}

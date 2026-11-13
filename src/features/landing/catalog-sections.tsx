@@ -8,7 +8,6 @@ import {
 } from "@/features/landing/data";
 import { normalizeLandingQuery } from "@/services/catalog/landing-service";
 import { PriceTag } from "@/components/shared/price-tag";
-import { categoryImagePosition, categoryImageUrl } from "@/lib/category-image";
 import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
 import { productImageAsset } from "@/lib/product-image";
 import { getCatalogUnavailableDescription } from "@/features/catalog/messages";
@@ -70,11 +69,6 @@ export async function LandingCategories({ locale }: { locale: SiteLocale }) {
   return (
     <div className="landing-categories">
       {categories.map((category, index) => {
-        const imagePosition = categoryImagePosition(
-          `${category.name} ${category.description ?? ""}`,
-        );
-        const imageUrl = categoryImageUrl(category.name);
-
         return (
           <Link
             className={`landing-category category-tone-${index % 3}`}
@@ -82,23 +76,9 @@ export async function LandingCategories({ locale }: { locale: SiteLocale }) {
             key={category.id}
             style={{ animationDelay: `${index * 70}ms` }}
           >
-            {(imagePosition || imageUrl) && (
-              <span
-                aria-hidden="true"
-                className="landing-category-art"
-                style={{
-                  backgroundPosition: imageUrl
-                    ? "center"
-                    : (imagePosition ?? undefined),
-                  ...(imageUrl
-                    ? {
-                        backgroundImage: `url('${imageUrl}')`,
-                        backgroundSize: "cover",
-                      }
-                    : {}),
-                }}
-              />
-            )}
+            <span aria-hidden="true" className="landing-category-art">
+              <Sprout className="size-12" strokeWidth={1.2} />
+            </span>
             <span className="landing-category-content">
               <span className="category-top">
                 <Sprout aria-hidden="true" className="size-6" />

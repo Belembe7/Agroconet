@@ -8,6 +8,7 @@ import {
   MessageCircle,
   PackageSearch,
   Truck,
+  UserRound,
 } from "lucide-react";
 import type { SiteLocale } from "@/lib/locale";
 import { ScrollRevealGroup } from "@/features/landing/scroll-reveal-group";
@@ -172,48 +173,42 @@ const marketplacePaths = [
     title: "Explore produtos e marcas",
     description: "Pesquise no catálogo e compare as opções publicadas.",
     href: "/produtos",
-    image: "/images/products/semente-tomate-f1-anaya.png",
-    imageAlt: "Embalagem de sementes de tomate",
+    icon: PackageSearch,
   },
   {
     category: "CATEGORIAS",
     title: "Encontre por categoria",
     description: "Navegue por grupos de produtos disponíveis na montra.",
     href: "/#categorias",
-    image: "/images/products/product-sheet-4.webp",
-    imageAlt: "Produtos agropecuários do catálogo",
+    icon: Sprout,
   },
   {
     category: "ENTREGAS",
     title: "Consulte a cobertura local",
     description: "Veja as zonas activas e combine os detalhes da entrega.",
     href: "/entrega",
-    image: "/images/products/conector-t-irrigacao.webp",
-    imageAlt: "Conector para sistema de irrigação",
+    icon: Truck,
   },
   {
     category: "APOIO",
     title: "Fale com a nossa equipa",
     description: "Esclareça dúvidas sobre produtos, disponibilidade ou compra.",
     href: "/apoio",
-    image: "/images/medicamentos-veterinarios-category.webp",
-    imageAlt: "Produtos de saúde veterinária",
+    icon: MessageCircle,
   },
   {
     category: "VENDEDORES",
     title: "Venda na Agroconet",
     description: "Conheça o processo para apresentar os seus produtos.",
     href: "/#vendedores",
-    image: "/images/products/pulverizador-16-l.webp",
-    imageAlt: "Pulverizador agrícola",
+    icon: BadgeCheck,
   },
   {
     category: "CONTA DE CLIENTE",
     title: "Crie a sua conta",
     description: "Aceda à sua área para acompanhar a experiência de compra.",
     href: "/registar",
-    image: "/images/products/kit-horta-domestica.webp",
-    imageAlt: "Kit para horta doméstica",
+    icon: UserRound,
   },
 ];
 
@@ -242,29 +237,29 @@ export function MarketplacePaths({ locale }: { locale: SiteLocale }) {
         </p>
       </div>
       <ScrollRevealGroup className="agro-paths-grid public-reveal-sequence">
-        {marketplacePaths.map((path, index) => (
-          <Link href={path.href} className="agro-path-card" key={path.title}>
-            <div className="agro-path-image" style={{ position: "relative" }}>
-              <Image
-                src={path.image}
-                alt={path.imageAlt}
-                fill
-                sizes="(max-width: 760px) 50vw, 33vw"
-              />
-              <span>{String(index + 1).padStart(2, "0")}</span>
-            </div>
-            <div className="agro-path-copy">
-              <p>
-                {english ? translatePathCategory(path.category) : path.category}
-              </p>
-              <h3>{english ? translatePathTitle(path.title) : path.title}</h3>
-              <span>
-                {english ? translatePathAction(path.category) : "Saber mais"}
-                <ArrowUpRight aria-hidden="true" className="size-4" />
-              </span>
-            </div>
-          </Link>
-        ))}
+        {marketplacePaths.map((path, index) => {
+          const PathIcon = path.icon;
+          return (
+            <Link href={path.href} className="agro-path-card" key={path.title}>
+              <div className="agro-path-image">
+                <PathIcon aria-hidden="true" strokeWidth={1.4} />
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              </div>
+              <div className="agro-path-copy">
+                <p>
+                  {english
+                    ? translatePathCategory(path.category)
+                    : path.category}
+                </p>
+                <h3>{english ? translatePathTitle(path.title) : path.title}</h3>
+                <span>
+                  {english ? translatePathAction(path.category) : "Saber mais"}
+                  <ArrowUpRight aria-hidden="true" className="size-4" />
+                </span>
+              </div>
+            </Link>
+          );
+        })}
       </ScrollRevealGroup>
     </section>
   );

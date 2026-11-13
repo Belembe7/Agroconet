@@ -1259,31 +1259,26 @@
   }
   .landing-category-art {
     position: absolute;
-    z-index: 0;
+    z-index: 2;
     inset: 0 0 0 auto;
+    display: grid;
     width: 58%;
-    background-image: url("/images/agro-stock-category-sheet.png");
-    background-repeat: no-repeat;
-    background-size: 300% 200%;
-    opacity: 0.92;
-    transform: scale(1.015);
+    place-items: center;
+    background-image: none;
+    color: #47704e;
+    opacity: 1;
+    transform: none;
     transition:
       transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1),
       opacity 0.4s ease;
-    mask-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgb(0 0 0 / 65%) 20%,
-      #000 48%
-    );
   }
   .landing-category:hover .landing-category-art {
     opacity: 1;
-    transform: scale(1.075);
+    transform: none;
   }
   .landing-category-content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     width: 100%;
     flex: 1;
@@ -1449,7 +1444,7 @@
     aspect-ratio: 1.12 / 1;
     min-height: 190px;
     gap: 10px;
-    background: #f1f2e9;
+    background: #fff;
     color: #7c8d6b;
   }
   .product-visual.product-visual-packaging,
@@ -3085,7 +3080,7 @@
     justify-content: center;
     gap: 10px;
     overflow: hidden;
-    background: linear-gradient(145deg, #edf2e6, #f7f2e9);
+    background: #fff;
     color: #617a57;
   }
   .catalog-product-image > span:not(.catalog-stock) {

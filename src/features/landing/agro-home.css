@@ -446,26 +446,29 @@
     inset: 0;
     border: 1px solid rgb(255 255 255 / 18%);
     border-radius: inherit;
-    background: linear-gradient(180deg, rgb(10 34 23 / 12%) 10%, rgb(10 34 23 / 88%) 100%);
+    background: transparent;
     content: "";
     pointer-events: none;
   }
 
   .agro-home .landing-category-art {
-    opacity: 0.76;
+    display: grid;
+    place-items: center;
+    color: #315a3d;
+    opacity: 1;
     transition:
       opacity 250ms ease,
       transform 550ms cubic-bezier(0.2, 0.75, 0.25, 1);
   }
 
   .agro-home .landing-category:hover .landing-category-art {
-    opacity: 0.92;
-    transform: scale(1.04);
+    opacity: 1;
+    transform: none;
   }
 
   .agro-home .landing-category-content {
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     inset: 0;
     display: flex;
     flex-direction: column;
@@ -735,17 +738,21 @@
 
   .agro-path-image {
     position: relative;
+    display: grid;
     aspect-ratio: 1.7;
     overflow: hidden;
+    place-items: center;
     background: #e6eee0;
+    color: #315a3d;
   }
 
-  .agro-path-image img {
-    object-fit: cover;
+  .agro-path-image > svg {
+    width: 52px;
+    height: 52px;
     transition: transform 500ms cubic-bezier(0.2, 0.75, 0.25, 1);
   }
 
-  .agro-path-card:hover .agro-path-image img {
+  .agro-path-card:hover .agro-path-image > svg {
     transform: scale(1.04);
   }
 
@@ -1270,7 +1277,7 @@
     .agro-button,
     .agro-home .landing-category-art,
     .agro-path-card,
-    .agro-path-image img {
+    .agro-path-image > svg {
       transition: none;
     }
   }
