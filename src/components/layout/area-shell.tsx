@@ -80,14 +80,16 @@ export function AreaShell({
         <header className="bg-card border-b px-4 py-4 sm:px-8">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <AreaBackButton
-                areaHomeHref={item.href}
-                returnLabel={
-                  area === "cliente"
-                    ? "Voltar à minha conta"
-                    : "Voltar ao painel"
-                }
-              />
+              {area !== "admin" && (
+                <AreaBackButton
+                  areaHomeHref={item.href}
+                  returnLabel={
+                    area === "cliente"
+                      ? "Voltar à minha conta"
+                      : "Voltar ao painel"
+                  }
+                />
+              )}
               <div className="min-w-0">
                 <p className="font-heading text-xl font-semibold">{title}</p>
                 <p className="text-muted-foreground text-sm">{subtitle}</p>
