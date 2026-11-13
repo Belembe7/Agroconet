@@ -507,7 +507,7 @@ export function AdminCatalogManager({
                   </span>
                 </Field>
                 <div className="flex items-end">
-                  <Button type="submit" variant="outline">
+                  <Button type="submit">
                     Guardar produto
                   </Button>
                 </div>
@@ -608,7 +608,7 @@ export function AdminCatalogManager({
                       </span>
                     </Field>
                     <div className="flex items-end">
-                      <Button type="submit" variant="outline">
+                      <Button type="submit">
                         Guardar variante
                       </Button>
                     </div>
