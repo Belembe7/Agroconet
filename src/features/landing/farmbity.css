@@ -3532,3 +3532,287 @@ body {
     }
   }
 }
+
+/* Final mobile layout overrides. These rules stay outside the component layer
+   so they take precedence over the legacy desktop-first rules above. */
+@media (max-width: 760px) {
+  :root {
+    --farm-gutter: 16px;
+  }
+
+  .storefront-navigation {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 62px;
+    gap: 8px;
+    padding: 8px var(--farm-gutter);
+  }
+
+  .storefront-navigation > .brand-lockup {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .storefront-navigation > .brand-lockup .brand-lockup-image {
+    width: 38px;
+    height: 38px;
+  }
+
+  .storefront-navigation > .brand-lockup > span {
+    max-width: 100px;
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .storefront-navigation > .storefront-actions {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-self: end;
+    gap: 4px;
+  }
+
+  .storefront-actions > .store-login,
+  .storefront-actions > .store-account-link,
+  .storefront-actions > .store-register,
+  .storefront-actions > .store-logout-button {
+    display: none;
+  }
+
+  .storefront-language-control {
+    width: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border: 1px solid var(--farm-line);
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  .storefront-language-control > svg {
+    display: block;
+    width: 17px;
+    height: 17px;
+    pointer-events: none;
+  }
+
+  .storefront-language,
+  .storefront-language select {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    opacity: 0;
+  }
+
+  .storefront-actions .farmbity-theme-toggle,
+  .storefront-actions .store-cart-link,
+  .storefront-actions .mobile-store-menu summary {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .storefront-actions .store-cart-link > span:not(.store-cart-count):not(.sr-only) {
+    display: none;
+  }
+
+  .storefront-actions .mobile-store-menu {
+    position: relative;
+    display: block;
+    flex: none;
+  }
+
+  .mobile-store-menu nav {
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(280px, calc(100vw - 24px));
+    max-height: min(70vh, 460px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .farm-home-page .agro-hero-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding: 34px var(--farm-gutter) 42px;
+  }
+
+  .farm-home-page .hero-login-card {
+    width: min(100%, 440px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 540px) {
+  .farm-home-page .agro-highlights-section,
+  .farm-home-page .agro-category-section,
+  .farm-home-page .guide-section {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .farm-home-page .agro-highlights-section > .section-topline,
+  .farm-home-page .agro-highlights-section > .catalog-results-bar,
+  .farm-home-page .agro-highlights-section > .catalog-search,
+  .farm-home-page .agro-highlights-section > .landing-products,
+  .farm-home-page .agro-highlights-section > .catalog-footnote,
+  .farm-home-page .agro-highlights-section > .empty-state,
+  .farm-home-page .agro-highlights-section > .error-state {
+    width: 100%;
+  }
+
+  .farm-home-page .agro-highlights-section .landing-products {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .farm-home-page .agro-highlights-section .landing-product {
+    display: grid;
+    min-height: 154px;
+    grid-template-columns: clamp(100px, 30vw, 132px) minmax(0, 1fr);
+  }
+
+  .farm-home-page .agro-highlights-section .product-visual {
+    width: 100%;
+    height: 100%;
+    min-height: 154px;
+    aspect-ratio: auto;
+  }
+
+  .farm-home-page .agro-highlights-section .product-copy {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .farm-home-page .agro-highlights-section .product-copy h3 {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .farm-home-page .agro-highlights-section .product-option,
+  .farm-home-page .agro-highlights-section .product-seller {
+    overflow: hidden;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .farm-home-page .agro-highlights-section .product-price {
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .farm-home-page .farm-process-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .catalog-page,
+  .favorites-page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .catalog-product-grid,
+  .favorites-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .catalog-product-card {
+    display: grid;
+    min-height: 146px;
+    grid-template-columns: clamp(96px, 30vw, 124px) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .catalog-product-image {
+    width: 100%;
+    height: 100%;
+    min-height: 146px;
+    aspect-ratio: auto;
+  }
+
+  .catalog-product-copy {
+    min-width: 0;
+    padding: 11px 12px;
+  }
+
+  .catalog-product-copy h2 {
+    min-height: 0;
+    font-size: 14px;
+    line-height: 1.3;
+    -webkit-line-clamp: 3;
+  }
+
+  .catalog-product-option,
+  .catalog-product-seller {
+    font-size: 10px;
+  }
+
+  .catalog-product-price {
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    padding-top: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --farm-gutter: 12px;
+  }
+
+  .storefront-navigation > .brand-lockup .brand-lockup-image {
+    width: 32px;
+    height: 32px;
+  }
+
+  .storefront-navigation > .brand-lockup > span {
+    max-width: 72px;
+    font-size: 12px;
+  }
+
+  .storefront-navigation > .storefront-actions {
+    gap: 2px;
+  }
+
+  .storefront-actions .storefront-language-control,
+  .storefront-actions .farmbity-theme-toggle {
+    width: 34px;
+    min-width: 34px;
+    height: 36px;
+    min-height: 36px;
+  }
+
+  .storefront-actions .store-cart-link,
+  .storefront-actions .mobile-store-menu summary {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+  }
+
+  .catalog-product-card {
+    grid-template-columns: 94px minmax(0, 1fr);
+  }
+
+  .catalog-product-copy {
+    padding: 10px;
+  }
+
+  .catalog-product-price > svg {
+    display: none;
+  }
+}
