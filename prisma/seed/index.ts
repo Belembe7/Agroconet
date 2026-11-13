@@ -125,7 +125,7 @@ async function main() {
       data: {
         id: randomUUID(),
         userId: user.id,
-        accountId: input.phoneNumber,
+        accountId: user.id,
         providerId: "credential",
         password: credentialPassword,
       },
