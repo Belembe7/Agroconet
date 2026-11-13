@@ -95,7 +95,6 @@ export class AdminService {
       payments,
       recentOrders,
       pendingSellers,
-      pendingProducts,
     ] = await Promise.all([
       this.db.order.count({ where: realOrderWhere }),
       this.db.seller.count({
@@ -135,20 +134,6 @@ export class AdminService {
           createdAt: true,
         },
       }),
-      this.db.product.findMany({
-        where: {
-          AND: [{ status: "PENDING_REVIEW" }, realProductWhere],
-        },
-        take: 8,
-        orderBy: { createdAt: "asc" },
-        select: {
-          id: true,
-          name: true,
-          createdAt: true,
-          seller: { select: { businessName: true } },
-          category: { select: { name: true } },
-        },
-      }),
     ]);
     return {
       stats: {
@@ -161,7 +146,6 @@ export class AdminService {
       },
       recentOrders,
       pendingSellers,
-      pendingProducts,
     };
   }
 
@@ -208,7 +192,12 @@ export class AdminService {
       this.db.category.findMany({
         where: realCategoryWhere,
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-        select: { id: true, name: true, isActive: true },
+        select: {
+          id: true,
+          name: true,
+          isActive: true,
+          requiresReview: true,
+        },
       }),
       this.db.seller.findMany({
         where: {
@@ -679,18 +668,7 @@ export class AdminService {
 
   async listCatalogAndOperations(actor: Actor) {
     this.authorize(actor);
-    const [categories, drivers, settings, auditLogs] = await Promise.all([
-      this.db.category.findMany({
-        where: realCategoryWhere,
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          isActive: true,
-          requiresReview: true,
-        },
-      }),
+    const [drivers, settings, auditLogs] = await Promise.all([
       this.db.driver.findMany({
         where: realDriverWhere,
         orderBy: { createdAt: "desc" },
@@ -722,7 +700,7 @@ export class AdminService {
         },
       }),
     ]);
-    return { categories, drivers, settings, auditLogs };
+    return { drivers, settings, auditLogs };
   }
 
   async approveDriver(actor: Actor, id: string) {

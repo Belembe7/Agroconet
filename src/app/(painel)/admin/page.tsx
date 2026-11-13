@@ -6,14 +6,7 @@ import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { AdminService } from "@/services/admin/admin-service";
 import { DeliveryService } from "@/services/delivery/delivery-service";
-import { AdminCatalogManager } from "@/features/admin/admin-catalog-manager";
-import {
-  approveDriverAction,
-  createCategoryAction,
-  reviewProductAction,
-  reviewSellerAction,
-  setCategoryActiveAction,
-} from "@/features/admin/actions";
+import { approveDriverAction, reviewSellerAction } from "@/features/admin/actions";
 import {
   assignDeliveryAction,
   createZoneAction,
@@ -36,11 +29,10 @@ async function AdminHomeContent() {
   await connection();
   const session = await getAppSession();
   if (!session) return null;
-  const [data, operations, dispatch, catalog] = await Promise.all([
+  const [data, operations, dispatch] = await Promise.all([
     new AdminService(prisma).overview(session.actor),
     new AdminService(prisma).listCatalogAndOperations(session.actor),
     new DeliveryService(prisma).listDispatch(session.actor),
-    new AdminService(prisma).catalogManagement(session.actor),
   ]);
   const stats = [
     ["Encomendas", data.stats.orders],
@@ -70,7 +62,6 @@ async function AdminHomeContent() {
           </article>
         ))}
       </section>
-      <AdminCatalogManager {...catalog} />
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="bg-card rounded-2xl border p-5">
           <h2 className="mb-4 text-lg font-semibold">
@@ -127,63 +118,6 @@ async function AdminHomeContent() {
           ) : (
             <p className="text-muted-foreground text-sm">
               Sem vendedores pendentes.
-            </p>
-          )}
-        </section>
-        <section className="bg-card rounded-2xl border p-5">
-          <h2 className="mb-4 text-lg font-semibold">
-            Produtos por analisar ({data.pendingProducts.length})
-          </h2>
-          {data.pendingProducts.length ? (
-            <ul className="divide-y">
-              {data.pendingProducts.map((product) => (
-                <li
-                  key={product.id}
-                  className="flex flex-wrap items-center justify-between gap-3 py-3"
-                >
-                  <div>
-                    <p className="font-medium">{displayName(product.name)}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {displayName(product.seller.businessName)} ·{" "}
-                      {displayName(product.category.name)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <ActionFeedbackForm
-                      action={reviewProductAction}
-                      successMessage="Produto aprovado."
-                      errorMessage="Não foi possível aprovar o produto. Atualize o painel e tente novamente."
-                    >
-                      <input type="hidden" name="id" value={product.id} />
-                      <input type="hidden" name="decision" value="approve" />
-                      <Button size="sm">Aprovar</Button>
-                    </ActionFeedbackForm>
-                    <ActionFeedbackForm
-                      action={reviewProductAction}
-                      className="flex gap-2"
-                      successMessage="Decisão sobre o produto guardada."
-                      errorMessage="Não foi possível rejeitar o produto. Atualize o painel e tente novamente."
-                    >
-                      <input type="hidden" name="id" value={product.id} />
-                      <input type="hidden" name="decision" value="reject" />
-                      <Input
-                        name="reason"
-                        placeholder="Motivo"
-                        maxLength={500}
-                        aria-label="Motivo da rejeição"
-                        className="w-28"
-                      />
-                      <Button size="sm" variant="destructive">
-                        Rejeitar
-                      </Button>
-                    </ActionFeedbackForm>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              Sem produtos pendentes.
             </p>
           )}
         </section>
@@ -376,68 +310,6 @@ async function AdminHomeContent() {
             Ainda não há entregadores.
           </p>
         )}
-      </section>
-      <section className="bg-card space-y-4 rounded-2xl border p-5">
-        <div>
-          <h2 className="text-lg font-semibold">Categorias</h2>
-          <p className="text-muted-foreground text-sm">
-            Criar e activar/desactivar categorias.
-          </p>
-        </div>
-        <ActionFeedbackForm
-          action={createCategoryAction}
-          className="flex flex-wrap gap-2"
-          successMessage="Categoria criada."
-          errorMessage="Não foi possível criar a categoria. Verifique os campos e tente novamente."
-        >
-          <Input
-            name="name"
-            placeholder="Nova categoria"
-            required
-            minLength={2}
-            maxLength={80}
-            className="min-w-48 flex-1"
-          />
-          <Input
-            name="description"
-            placeholder="Descrição (opcional)"
-            maxLength={500}
-            className="min-w-48 flex-1"
-          />
-          <Button>Criar categoria</Button>
-        </ActionFeedbackForm>
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {operations.categories.map((category) => (
-            <li
-              key={category.id}
-              className="flex items-center justify-between gap-3 rounded-xl border p-3"
-            >
-              <div>
-                <p className="font-medium">{displayName(category.name)}</p>
-                <p className="text-muted-foreground text-sm">
-                  {category.requiresReview
-                    ? "Requer revisão"
-                    : "Revisão normal"}
-                </p>
-              </div>
-              <ActionFeedbackForm
-                action={setCategoryActiveAction}
-                successMessage="Estado da categoria atualizado."
-                errorMessage="Não foi possível atualizar a categoria. Atualize o painel e tente novamente."
-              >
-                <input type="hidden" name="id" value={category.id} />
-                <input
-                  type="hidden"
-                  name="active"
-                  value={String(!category.isActive)}
-                />
-                <Button size="sm" variant="outline">
-                  {category.isActive ? "Desactivar" : "Activar"}
-                </Button>
-              </ActionFeedbackForm>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );

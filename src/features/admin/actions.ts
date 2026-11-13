@@ -67,6 +67,7 @@ async function productImages(formData: FormData, alt: string) {
 
 function refreshCatalog() {
   revalidatePath("/admin");
+  revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
   revalidatePath("/produtos/[slug]", "page");
   revalidatePath("/");
@@ -104,6 +105,7 @@ export async function reviewProductAction(formData: FormData) {
     String(formData.get("reason") ?? ""),
   );
   revalidatePath("/admin");
+  revalidatePath("/admin/produtos");
 }
 
 export async function approveDriverAction(formData: FormData) {
@@ -124,6 +126,7 @@ export async function createCategoryAction(formData: FormData) {
     description: String(formData.get("description") ?? ""),
   });
   revalidatePath("/admin");
+  revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
 }
 
@@ -141,6 +144,7 @@ export async function setCategoryActiveAction(formData: FormData) {
     })(),
   );
   revalidatePath("/admin");
+  revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
 }
 

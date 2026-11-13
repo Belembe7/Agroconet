@@ -10,6 +10,9 @@ import { formatPrice } from "@/lib/format";
 import { displayName } from "@/lib/display-name";
 import {
   createCatalogProductAction,
+  createCategoryAction,
+  reviewProductAction,
+  setCategoryActiveAction,
   updateCatalogProductAction,
   updateCatalogVariantAction,
 } from "@/features/admin/actions";
@@ -90,6 +93,9 @@ export function AdminCatalogManager({
   sellers,
 }: AdminCatalogManagementData) {
   const [search, setSearch] = useState("");
+  const pendingProducts = products.filter(
+    (product) => product.status === "PENDING_REVIEW",
+  );
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLocaleLowerCase("pt-MZ");
     if (!query) return products;
@@ -125,6 +131,64 @@ export function AdminCatalogManager({
           {products.length} produtos
         </span>
       </div>
+
+      <section className="rounded-xl border p-4">
+        <h3 className="font-semibold">
+          Produtos por analisar ({pendingProducts.length})
+        </h3>
+        {pendingProducts.length ? (
+          <ul className="mt-2 divide-y">
+            {pendingProducts.map((product) => (
+              <li
+                key={product.id}
+                className="flex flex-wrap items-center justify-between gap-3 py-3"
+              >
+                <div>
+                  <p className="font-medium">{displayName(product.name)}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {displayName(product.seller.businessName)} ·{" "}
+                    {displayName(product.category.name)}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <ActionFeedbackForm
+                    action={reviewProductAction}
+                    successMessage="Produto aprovado."
+                    errorMessage="Não foi possível aprovar o produto. Atualize a página e tente novamente."
+                  >
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="decision" value="approve" />
+                    <Button size="sm">Aprovar</Button>
+                  </ActionFeedbackForm>
+                  <ActionFeedbackForm
+                    action={reviewProductAction}
+                    className="flex gap-2"
+                    successMessage="Decisão sobre o produto guardada."
+                    errorMessage="Não foi possível rejeitar o produto. Atualize a página e tente novamente."
+                  >
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="decision" value="reject" />
+                    <input
+                      className={inputClass}
+                      name="reason"
+                      placeholder="Motivo da rejeição"
+                      maxLength={500}
+                      aria-label="Motivo da rejeição"
+                    />
+                    <Button size="sm" variant="destructive">
+                      Rejeitar
+                    </Button>
+                  </ActionFeedbackForm>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground mt-2 text-sm">
+            Sem produtos pendentes de análise.
+          </p>
+        )}
+      </section>
 
       <details className="rounded-xl border p-4">
         <summary className="cursor-pointer font-semibold">
@@ -564,6 +628,78 @@ export function AdminCatalogManager({
           </p>
         ) : null}
       </div>
+
+      <section className="space-y-4 rounded-xl border p-4">
+        <div>
+          <h3 className="font-semibold">Categorias de produtos</h3>
+          <p className="text-muted-foreground text-sm">
+            Crie categorias e active ou desactive as opções disponíveis na loja.
+          </p>
+        </div>
+        <ActionFeedbackForm
+          action={createCategoryAction}
+          className="flex flex-wrap gap-2"
+          successMessage="Categoria criada."
+          errorMessage="Não foi possível criar a categoria. Verifique os campos e tente novamente."
+        >
+          <input
+            className={`${inputClass} min-w-48 flex-1`}
+            name="name"
+            placeholder="Nome da nova categoria"
+            required
+            minLength={2}
+            maxLength={80}
+          />
+          <input
+            className={`${inputClass} min-w-48 flex-1`}
+            name="description"
+            placeholder="Descrição (opcional)"
+            maxLength={500}
+          />
+          <Button>Criar categoria</Button>
+        </ActionFeedbackForm>
+        {categories.length ? (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {categories.map((category) => (
+              <li
+                key={category.id}
+                className="flex items-center justify-between gap-3 rounded-xl border p-3"
+              >
+                <div>
+                  <p className="font-medium">
+                    {displayName(category.name)}
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {category.requiresReview
+                      ? "Requer revisão de produtos"
+                      : "Revisão normal"}
+                    {category.isActive ? " · Activa" : " · Inactiva"}
+                  </p>
+                </div>
+                <ActionFeedbackForm
+                  action={setCategoryActiveAction}
+                  successMessage="Estado da categoria actualizado."
+                  errorMessage="Não foi possível actualizar a categoria. Actualize a página e tente novamente."
+                >
+                  <input type="hidden" name="id" value={category.id} />
+                  <input
+                    type="hidden"
+                    name="active"
+                    value={String(!category.isActive)}
+                  />
+                  <Button size="sm" variant="outline">
+                    {category.isActive ? "Desactivar" : "Activar"}
+                  </Button>
+                </ActionFeedbackForm>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Ainda não há categorias reais configuradas.
+          </p>
+        )}
+      </section>
     </section>
   );
 }

@@ -5,6 +5,7 @@ import { Brand } from "@/components/layout/brand";
 import { AreaBackButton } from "@/components/layout/area-back-button";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { displayName } from "@/lib/display-name";
+import { AdminPanelNavigation } from "@/components/layout/admin-panel-navigation";
 
 const areas = {
   admin: { href: "/admin", label: "Visão geral", icon: LayoutDashboard },
@@ -42,32 +43,20 @@ export function AreaShell({
           <p className="mt-10 mb-3 text-xs tracking-widest uppercase">
             {title}
           </p>
-          <nav aria-label="Navegação do painel">
-            <Link
-              aria-current="page"
-              href={item.href}
-              className="bg-sidebar-accent flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm"
-            >
-              <Icon aria-hidden="true" className="size-4" />
-              {item.label}
-            </Link>
-            {area === "admin" && (
-              <>
-                <Link
-                  href="/admin/apoio"
-                  className="flex min-h-11 items-center rounded-lg px-3 text-sm"
-                >
-                  Atendimento aos clientes
-                </Link>
-                <Link
-                  href="/entrega"
-                  className="flex min-h-11 items-center rounded-lg px-3 text-sm"
-                >
-                  Mapa de entregas
-                </Link>
-              </>
-            )}
-          </nav>
+          {area === "admin" ? (
+            <AdminPanelNavigation />
+          ) : (
+            <nav aria-label="Navegação do painel">
+              <Link
+                aria-current="page"
+                href={item.href}
+                className="bg-sidebar-accent flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm"
+              >
+                <Icon aria-hidden="true" className="size-4" />
+                {item.label}
+              </Link>
+            </nav>
+          )}
           <Link
             href="/"
             className="mt-auto flex min-h-11 items-center text-sm underline underline-offset-4"
@@ -103,35 +92,30 @@ export function AreaShell({
             </div>
           </div>
         </header>
-        {panel && (
-          <nav
-            aria-label="Navegação móvel"
-            className="bg-card border-b px-4 md:hidden"
-          >
-            <Link
-              href={item.href}
-              aria-current="page"
-              className="inline-flex min-h-11 items-center gap-2 text-sm"
+        {panel &&
+          (area === "admin" ? (
+            <AdminPanelNavigation mobile />
+          ) : (
+            <nav
+              aria-label="Navegação móvel"
+              className="bg-card border-b px-4 md:hidden"
             >
-              <Icon aria-hidden="true" className="size-4" />
-              {item.label}
-            </Link>
-            {area === "admin" && (
               <Link
-                href="/admin/apoio"
-                className="ml-6 inline-flex min-h-11 items-center text-sm"
+                href={item.href}
+                aria-current="page"
+                className="inline-flex min-h-11 items-center gap-2 text-sm"
               >
-                Atendimento
+                <Icon aria-hidden="true" className="size-4" />
+                {item.label}
               </Link>
-            )}
-            <Link
-              href="/"
-              className="ml-6 inline-flex min-h-11 items-center text-sm underline"
-            >
-              Loja
-            </Link>
-          </nav>
-        )}
+              <Link
+                href="/"
+                className="ml-6 inline-flex min-h-11 items-center text-sm underline"
+              >
+                Loja
+              </Link>
+            </nav>
+          ))}
         <main
           id="area-conteudo"
           className={`mx-auto w-full flex-1 px-4 py-8 sm:px-8 ${area === "entregador" ? "max-w-xl pb-28" : "max-w-6xl"}`}
