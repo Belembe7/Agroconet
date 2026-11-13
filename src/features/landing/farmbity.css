@@ -3535,6 +3535,12 @@ body {
 
 /* Final mobile layout overrides. These rules stay outside the component layer
    so they take precedence over the legacy desktop-first rules above. */
+.storefront-actions .storefront-language-control,
+.storefront-actions .farmbity-theme-toggle {
+  border: 0;
+  background: transparent;
+}
+
 @media (max-width: 760px) {
   :root {
     --farm-gutter: 16px;
