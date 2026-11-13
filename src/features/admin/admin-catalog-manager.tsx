@@ -96,6 +96,9 @@ export function AdminCatalogManager({
   const pendingProducts = products.filter(
     (product) => product.status === "PENDING_REVIEW",
   );
+  const estimatedProducts = products.filter((product) =>
+    product.description?.startsWith("Dados estimados:"),
+  );
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLocaleLowerCase("pt-MZ");
     if (!query) return products;
@@ -126,6 +129,12 @@ export function AdminCatalogManager({
             Crie, edite, publique, ajuste stock e envie as fotos que aparecem na
             loja.
           </p>
+          {estimatedProducts.length ? (
+            <p className="text-muted-foreground mt-1 text-sm">
+              {estimatedProducts.length} produtos com valores estimados estão
+              disponíveis para actualizar aqui.
+            </p>
+          ) : null}
         </div>
         <span className="text-muted-foreground text-sm">
           {products.length} produtos

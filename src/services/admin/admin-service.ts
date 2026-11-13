@@ -2,6 +2,7 @@ import {
   InventoryMovementType,
   ProductStatus,
   ProductUnit,
+  type Prisma,
   type PrismaClient,
 } from "@/generated/prisma/client";
 import type { Actor } from "@/lib/permissions";
@@ -22,6 +23,31 @@ const uuid =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const productUnits = Object.values(ProductUnit) as string[];
 const productStatuses = Object.values(ProductStatus) as string[];
+
+// Featured estimates are editable catalogue records, while generic DEV/DEMO
+// fixtures stay excluded from the admin product manager.
+const estimatedFeaturedProductWhere: Prisma.ProductWhereInput = {
+  deletedAt: null,
+  slug: { not: "semente-pepino-f1-nagano-estimada" },
+  OR: [
+    { variants: { some: { deletedAt: null, sku: { startsWith: "EST-FEATURED-" } } } },
+    { slug: { contains: "-estimad" } },
+  ],
+};
+
+const adminCatalogProductWhere: Prisma.ProductWhereInput = {
+  OR: [realProductWhere, estimatedFeaturedProductWhere],
+};
+
+const adminCatalogCategoryWhere: Prisma.CategoryWhereInput = {
+  OR: [
+    realCategoryWhere,
+    {
+      deletedAt: null,
+      products: { some: estimatedFeaturedProductWhere },
+    },
+  ],
+};
 
 export type AdminProductImageInput = {
   storageKey: string;
@@ -154,7 +180,7 @@ export class AdminService {
     assertCan(actor, "product:update");
     const [products, categories, sellers] = await Promise.all([
       this.db.product.findMany({
-        where: realProductWhere,
+        where: adminCatalogProductWhere,
         orderBy: [{ updatedAt: "desc" }, { name: "asc" }],
         select: {
           id: true,
@@ -190,7 +216,7 @@ export class AdminService {
         },
       }),
       this.db.category.findMany({
-        where: realCategoryWhere,
+        where: adminCatalogCategoryWhere,
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
         select: {
           id: true,
@@ -403,11 +429,11 @@ export class AdminService {
 
     const [product, category] = await Promise.all([
       this.db.product.findFirst({
-        where: { AND: [{ id: input.productId }, realProductWhere] },
+        where: { AND: [{ id: input.productId }, adminCatalogProductWhere] },
         select: { id: true, name: true, status: true },
       }),
       this.db.category.findFirst({
-        where: { AND: [{ id: input.categoryId }, realCategoryWhere] },
+        where: { AND: [{ id: input.categoryId }, adminCatalogCategoryWhere] },
         select: { id: true, isActive: true },
       }),
     ]);
@@ -518,7 +544,9 @@ export class AdminService {
         id: input.variantId,
         productId: input.productId,
         deletedAt: null,
-        product: { is: { AND: [{ id: input.productId }, realProductWhere] } },
+        product: {
+          is: { AND: [{ id: input.productId }, adminCatalogProductWhere] },
+        },
       },
       select: { id: true, sku: true, priceCents: true },
     });
