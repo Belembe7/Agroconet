@@ -87,7 +87,10 @@ async function CartContents() {
                       alt={item.imageAlt || item.productName}
                       fill
                       sizes="110px"
-                      unoptimized={/^https?:\/\//.test(item.imageUrl)}
+                      unoptimized={
+                        /^https?:\/\//.test(item.imageUrl) ||
+                        item.imageUrl.startsWith("/api/product-images/")
+                      }
                     />
                   ) : (
                     <Package

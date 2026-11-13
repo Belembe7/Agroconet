@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { displayName } from "@/lib/display-name";
+import { productImagePublicUrl } from "@/lib/product-image-storage";
 
 const MAX_LINE_QUANTITY = 99;
 const GUEST_CART_TTL_MS = 30 * 24 * 60 * 60 * 1000;
@@ -72,6 +73,7 @@ const cartItemViewSelect = {
           },
           images: {
             select: {
+              id: true,
               storageKey: true,
               alt: true,
               sortOrder: true,
@@ -89,19 +91,6 @@ const cartItemViewSelect = {
 type CartItemRecord = Prisma.CartItemGetPayload<{
   select: typeof cartItemViewSelect;
 }>;
-
-function safeImageUrl(storageKey: string): string | null {
-  if (storageKey.startsWith("/") && !storageKey.startsWith("//"))
-    return storageKey;
-  try {
-    const url = new URL(storageKey);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
-}
 
 function isPublicItem(item: CartItemRecord) {
   const product = item.variant.product;
@@ -142,7 +131,9 @@ function snapshot(items: CartItemRecord[]): CartSnapshot {
       priceCents: item.variant.priceCents,
       quantity: item.quantity,
       available,
-      imageUrl: image ? safeImageUrl(image.storageKey) : null,
+      imageUrl: image
+        ? productImagePublicUrl(image.storageKey, image.id)
+        : null,
       imageAlt: image?.alt ? displayName(image.alt) : null,
       lineTotalCents,
     };

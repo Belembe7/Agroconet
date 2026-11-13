@@ -210,9 +210,7 @@ export async function LandingHighlights({
             const isSeedPackagePhoto =
               productFallbackImage?.src.endsWith(".png") ?? false;
             const usesPackagingPhoto = product.estimated || isSeedPackagePhoto;
-            const imageUrl = isSeedPackagePhoto
-              ? (productFallbackImage?.src ?? product.imageUrl)
-              : product.imageUrl;
+            const imageUrl = product.imageUrl ?? productFallbackImage?.src;
             return (
               <Link
                 prefetch={false}
@@ -234,7 +232,10 @@ export async function LandingHighlights({
                         alt={product.imageAlt || product.name}
                         fill
                         sizes="(max-width: 760px) 50vw, 25vw"
-                        unoptimized={/^https?:\/\//.test(imageUrl)}
+                        unoptimized={
+                          /^https?:\/\//.test(imageUrl) ||
+                          imageUrl.startsWith("/api/product-images/")
+                        }
                         className={
                           usesPackagingPhoto
                             ? "product-packaging-photo object-contain"
@@ -290,7 +291,18 @@ export async function LandingHighlights({
                     </p>
                     <div className="product-price">
                       <span>{english ? "From" : "A partir de"}</span>
-                      <PriceTag cents={product.priceCents} />
+                      <div className="flex flex-col items-start leading-tight">
+                        {product.compareAtPriceCents ? (
+                          <PriceTag
+                            cents={product.compareAtPriceCents}
+                            className="text-muted-foreground text-[11px] font-normal line-through"
+                          />
+                        ) : null}
+                        <PriceTag
+                          cents={product.priceCents}
+                          className="text-[17px]"
+                        />
+                      </div>
                     </div>
                   </div>
                 </article>

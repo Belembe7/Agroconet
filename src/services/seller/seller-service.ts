@@ -60,7 +60,7 @@ export class SellerService {
           rejectionReason: true,
           category: { select: { name: true } },
           images: {
-            select: { storageKey: true, alt: true },
+            select: { id: true, storageKey: true, alt: true },
             orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }],
             take: 1,
           },

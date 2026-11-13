@@ -3,16 +3,16 @@ import Link from "next/link";
 import { ArrowUpRight, Package, Star } from "lucide-react";
 import { PriceTag } from "@/components/shared/price-tag";
 import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
+import { formatPrice } from "@/lib/format";
 import { productImageAsset } from "@/lib/product-image";
 import type { CatalogProductCard } from "@/services/catalog/catalog-service";
 
 export function ProductCard({ product }: { product: CatalogProductCard }) {
   const productFallbackImage = productImageAsset(product.name);
-  const isSeedPackagePhoto = productFallbackImage?.src.endsWith(".png") ?? false;
+  const isSeedPackagePhoto =
+    productFallbackImage?.src.endsWith(".png") ?? false;
   const usesPackagingPhoto = product.estimated || isSeedPackagePhoto;
-  const imageUrl = isSeedPackagePhoto
-    ? (productFallbackImage?.src ?? product.imageUrl)
-    : product.imageUrl;
+  const imageUrl = product.imageUrl ?? productFallbackImage?.src ?? null;
 
   return (
     <Link
@@ -33,7 +33,10 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
             alt={product.imageAlt || product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            unoptimized={/^https?:\/\//.test(imageUrl)}
+            unoptimized={
+              /^https?:\/\//.test(imageUrl) ||
+              imageUrl.startsWith("/api/product-images/")
+            }
             className={
               usesPackagingPhoto
                 ? "product-packaging-photo object-contain"
@@ -83,7 +86,14 @@ export function ProductCard({ product }: { product: CatalogProductCard }) {
         </p>
         <div className="catalog-product-price">
           <span>A partir de</span>
-          <PriceTag cents={product.priceCents} />
+          <div className="flex flex-col items-start leading-tight">
+            {product.compareAtPriceCents ? (
+              <span className="text-muted-foreground text-[11px] font-normal line-through">
+                {formatPrice(product.compareAtPriceCents)}
+              </span>
+            ) : null}
+            <PriceTag cents={product.priceCents} className="text-[17px]" />
+          </div>
           <ArrowUpRight aria-hidden="true" className="ml-auto size-4" />
         </div>
       </div>

@@ -13,6 +13,7 @@ type VariantOption = {
   id: string;
   label: string;
   priceCents: number;
+  compareAtPriceCents: number | null;
   available: number;
   isDefault: boolean;
 };
@@ -76,6 +77,12 @@ export function AddToCartForm({
       {selected ? (
         <p className="add-to-cart-price">
           <PriceTag cents={selected.priceCents} />
+          {selected.compareAtPriceCents &&
+          selected.compareAtPriceCents > selected.priceCents ? (
+            <span className="text-muted-foreground ml-2 text-sm font-normal line-through">
+              <PriceTag cents={selected.compareAtPriceCents} />
+            </span>
+          ) : null}
         </p>
       ) : null}
       <label htmlFor="product-quantity">Quantidade</label>

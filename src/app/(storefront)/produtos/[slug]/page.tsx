@@ -88,9 +88,7 @@ async function ProductContent({ params }: Props) {
   const isSeedPackagePhoto = fallbackImage?.src.endsWith(".png") ?? false;
   const estimated =
     product.description?.startsWith("Dados estimados:") ?? false;
-  const mainImage = isSeedPackagePhoto
-    ? (fallbackImage?.src ?? product.images[0]?.url)
-    : product.images[0]?.url;
+  const mainImage = product.images[0]?.url ?? fallbackImage?.src;
   const usesPackagingPhoto = estimated || isSeedPackagePhoto;
 
   const schema = {
@@ -104,8 +102,8 @@ async function ProductContent({ params }: Props) {
     image: mainImage
       ? [mainImage]
       : product.images.length
-      ? product.images.map((image) => image.url)
-      : undefined,
+        ? product.images.map((image) => image.url)
+        : undefined,
     category: product.category.name,
     aggregateRating:
       product.ratingCount > 0
@@ -130,9 +128,10 @@ async function ProductContent({ params }: Props) {
     })),
   };
   const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
-  const minimumPrice = Math.min(
-    ...product.variants.map((variant) => variant.priceCents),
+  const minimumVariant = product.variants.reduce((minimum, variant) =>
+    variant.priceCents < minimum.priceCents ? variant : minimum,
   );
+  const minimumPrice = minimumVariant.priceCents;
 
   return (
     <main className="product-detail-page">
@@ -158,7 +157,7 @@ async function ProductContent({ params }: Props) {
         <div className="product-gallery" aria-label="Imagens do produto">
           {mainImage ? (
             <div
-              className={`product-gallery-main${usesPackagingPhoto ? " product-gallery-main-packaging" : ""}`}
+              className={`product-gallery-main${usesPackagingPhoto ? "product-gallery-main-packaging" : ""}`}
             >
               <Image
                 src={mainImage}
@@ -166,7 +165,10 @@ async function ProductContent({ params }: Props) {
                 fill
                 priority
                 sizes="(max-width: 800px) 100vw, 50vw"
-                unoptimized={/^https?:\/\//.test(mainImage)}
+                unoptimized={
+                  /^https?:\/\//.test(mainImage) ||
+                  mainImage.startsWith("/api/product-images/")
+                }
                 className={
                   usesPackagingPhoto
                     ? "product-packaging-detail-photo object-contain"
@@ -189,7 +191,7 @@ async function ProductContent({ params }: Props) {
               <span>Fotografia em breve</span>
             </div>
           )}
-          {!isSeedPackagePhoto && product.images.length > 1 ? (
+          {product.images.length > 1 ? (
             <div className="product-gallery-thumbnails">
               {product.images.slice(1, 5).map((image, index) => (
                 <div
@@ -201,7 +203,10 @@ async function ProductContent({ params }: Props) {
                     alt={image.alt || `${product.name}, imagem ${index + 2}`}
                     fill
                     sizes="120px"
-                    unoptimized={/^https?:\/\//.test(image.url)}
+                    unoptimized={
+                      /^https?:\/\//.test(image.url) ||
+                      image.url.startsWith("/api/product-images/")
+                    }
                   />
                 </div>
               ))}
@@ -237,7 +242,19 @@ async function ProductContent({ params }: Props) {
           )}
           <div className="product-detail-price">
             <span>A partir de</span>
-            <PriceTag cents={minimumPrice} />
+            <div className="flex flex-wrap items-baseline gap-2">
+              <PriceTag
+                cents={minimumPrice}
+                className="text-[28px] font-bold tracking-[-0.04em] text-[#185d3e]"
+              />
+              {minimumVariant.compareAtPriceCents &&
+              minimumVariant.compareAtPriceCents > minimumPrice ? (
+                <PriceTag
+                  cents={minimumVariant.compareAtPriceCents}
+                  className="text-muted-foreground text-sm font-normal line-through"
+                />
+              ) : null}
+            </div>
           </div>
           <p className="product-detail-seller">
             {estimated ? (
@@ -258,6 +275,7 @@ async function ProductContent({ params }: Props) {
                 id: variant.id,
                 label: variant.label,
                 priceCents: variant.priceCents,
+                compareAtPriceCents: variant.compareAtPriceCents,
                 available: variant.available,
                 isDefault: variant.isDefault,
               }))}

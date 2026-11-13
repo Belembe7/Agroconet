@@ -10,6 +10,7 @@ import { formatPrice } from "@/lib/format";
 import { displayDescription, displayName } from "@/lib/display-name";
 import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
 import { productImageAsset } from "@/lib/product-image";
+import { productImagePublicUrl } from "@/lib/product-image-storage";
 import { prisma } from "@/lib/db";
 import { requireAreaSession } from "@/lib/session";
 import { ActionFeedbackForm } from "@/components/shared/action-feedback-form";
@@ -51,27 +52,16 @@ const units = [
 const inputClass =
   "border-input bg-background min-h-11 w-full rounded-lg border px-3 text-sm";
 
-function safeProductImageUrl(storageKey: string): string | null {
-  if (storageKey.startsWith("/") && !storageKey.startsWith("//"))
-    return storageKey;
-  try {
-    const url = new URL(storageKey);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 function ProductStockThumbnail({
   image,
   productName,
 }: {
-  image: { storageKey: string; alt: string | null } | undefined;
+  image: { id: string; storageKey: string; alt: string | null } | undefined;
   productName: string;
 }) {
-  const imageUrl = image ? safeProductImageUrl(image.storageKey) : null;
+  const imageUrl = image
+    ? productImagePublicUrl(image.storageKey, image.id)
+    : null;
   if (imageUrl)
     return (
       <div className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-xl border">
@@ -80,7 +70,10 @@ function ProductStockThumbnail({
           alt={displayName(image?.alt || productName)}
           fill
           sizes="80px"
-          unoptimized={/^https?:\/\//.test(imageUrl)}
+          unoptimized={
+            /^https?:\/\//.test(imageUrl) ||
+            imageUrl.startsWith("/api/product-images/")
+          }
           className="object-cover"
         />
       </div>

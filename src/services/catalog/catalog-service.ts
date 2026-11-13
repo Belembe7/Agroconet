@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { displayDescription, displayName } from "@/lib/display-name";
+import { productImagePublicUrl } from "@/lib/product-image-storage";
 
 const PAGE_SIZE = 12;
 const MAX_PAGE = 10_000;
@@ -96,6 +97,7 @@ export type CatalogProductCard = {
   estimated: boolean;
   label: string;
   priceCents: number;
+  compareAtPriceCents: number | null;
   available: boolean;
   ratingAvg: number;
   ratingCount: number;
@@ -128,17 +130,11 @@ const publicProductWhere: Prisma.ProductWhereInput = {
   variants: { some: { isActive: true, deletedAt: null } },
 };
 
-export function publicImageUrl(storageKey: string): string | null {
-  if (storageKey.startsWith("/") && !storageKey.startsWith("//"))
-    return storageKey;
-  try {
-    const url = new URL(storageKey);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
+export function publicImageUrl(
+  storageKey: string,
+  imageId?: string,
+): string | null {
+  return productImagePublicUrl(storageKey, imageId);
 }
 
 type ProductWithCardFields = Prisma.ProductGetPayload<{
@@ -153,7 +149,13 @@ type ProductWithCardFields = Prisma.ProductGetPayload<{
     category: { select: { name: true; slug: true } };
     seller: { select: { businessName: true } };
     images: {
-      select: { storageKey: true; alt: true; sortOrder: true; isPrimary: true };
+      select: {
+        id: true;
+        storageKey: true;
+        alt: true;
+        sortOrder: true;
+        isPrimary: true;
+      };
       orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }];
       take: 1;
     };
@@ -162,6 +164,7 @@ type ProductWithCardFields = Prisma.ProductGetPayload<{
       select: {
         label: true;
         priceCents: true;
+        compareAtPriceCents: true;
         inventory: { select: { quantityOnHand: true; quantityReserved: true } };
       };
       orderBy: [{ priceCents: "asc" }, { id: "asc" }];
@@ -184,6 +187,11 @@ function toCard(product: ProductWithCardFields): CatalogProductCard | null {
     estimated: product.description?.startsWith("Dados estimados:") ?? false,
     label: displayName(variant.label),
     priceCents: variant.priceCents,
+    compareAtPriceCents:
+      variant.compareAtPriceCents !== null &&
+      variant.compareAtPriceCents > variant.priceCents
+        ? variant.compareAtPriceCents
+        : null,
     available: product.variants.some(
       (option) =>
         (option.inventory?.quantityOnHand ?? 0) -
@@ -192,7 +200,7 @@ function toCard(product: ProductWithCardFields): CatalogProductCard | null {
     ),
     ratingAvg: Number(product.ratingAvg),
     ratingCount: product.ratingCount,
-    imageUrl: image ? publicImageUrl(image.storageKey) : null,
+    imageUrl: image ? publicImageUrl(image.storageKey, image.id) : null,
     imageAlt: image?.alt ? displayName(image.alt) : null,
   };
 }
@@ -324,6 +332,7 @@ export class CatalogService {
         seller: { select: { businessName: true } },
         images: {
           select: {
+            id: true,
             storageKey: true,
             alt: true,
             sortOrder: true,
@@ -337,6 +346,7 @@ export class CatalogService {
           select: {
             label: true,
             priceCents: true,
+            compareAtPriceCents: true,
             inventory: {
               select: { quantityOnHand: true, quantityReserved: true },
             },
@@ -417,7 +427,13 @@ const productCardSelect = {
   category: { select: { name: true, slug: true } },
   seller: { select: { businessName: true } },
   images: {
-    select: { storageKey: true, alt: true, sortOrder: true, isPrimary: true },
+    select: {
+      id: true,
+      storageKey: true,
+      alt: true,
+      sortOrder: true,
+      isPrimary: true,
+    },
     orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }],
     take: 1,
   },
@@ -426,6 +442,7 @@ const productCardSelect = {
     select: {
       label: true,
       priceCents: true,
+      compareAtPriceCents: true,
       inventory: { select: { quantityOnHand: true, quantityReserved: true } },
     },
     orderBy: [{ priceCents: "asc" }, { id: "asc" }],
@@ -452,7 +469,7 @@ const productDetailSelect = {
     },
   },
   images: {
-    select: { storageKey: true, alt: true, sortOrder: true },
+    select: { id: true, storageKey: true, alt: true, sortOrder: true },
     orderBy: { sortOrder: "asc" },
   },
   variants: {
@@ -489,7 +506,7 @@ type ProductDetailRecord = Prisma.ProductGetPayload<{
 function mapProductDetail(product: ProductDetailRecord, requestedSlug: string) {
   const images = product.images
     .map((image) => ({
-      url: publicImageUrl(image.storageKey),
+      url: publicImageUrl(image.storageKey, image.id),
       alt: image.alt ? displayName(image.alt) : null,
       sortOrder: image.sortOrder,
     }))

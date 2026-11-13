@@ -6,6 +6,7 @@ import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { AdminService } from "@/services/admin/admin-service";
 import { DeliveryService } from "@/services/delivery/delivery-service";
+import { AdminCatalogManager } from "@/features/admin/admin-catalog-manager";
 import {
   approveDriverAction,
   createCategoryAction,
@@ -35,10 +36,11 @@ async function AdminHomeContent() {
   await connection();
   const session = await getAppSession();
   if (!session) return null;
-  const [data, operations, dispatch] = await Promise.all([
+  const [data, operations, dispatch, catalog] = await Promise.all([
     new AdminService(prisma).overview(session.actor),
     new AdminService(prisma).listCatalogAndOperations(session.actor),
     new DeliveryService(prisma).listDispatch(session.actor),
+    new AdminService(prisma).catalogManagement(session.actor),
   ]);
   const stats = [
     ["Encomendas", data.stats.orders],
@@ -68,6 +70,7 @@ async function AdminHomeContent() {
           </article>
         ))}
       </section>
+      <AdminCatalogManager {...catalog} />
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="bg-card rounded-2xl border p-5">
           <h2 className="mb-4 text-lg font-semibold">

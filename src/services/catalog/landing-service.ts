@@ -118,7 +118,7 @@ export class LandingService {
         category: { select: { name: true } },
         seller: { select: { businessName: true } },
         images: {
-          select: { storageKey: true, alt: true },
+          select: { id: true, storageKey: true, alt: true },
           orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }],
           take: 1,
         },
@@ -129,6 +129,7 @@ export class LandingService {
           select: {
             label: true,
             priceCents: true,
+            compareAtPriceCents: true,
             inventory: {
               select: { quantityOnHand: true, quantityReserved: true },
             },
@@ -147,13 +148,18 @@ export class LandingService {
           slug: product.slug,
           brand: product.brand ? displayName(product.brand) : null,
           category: displayName(product.category.name),
-          imageUrl: image ? publicImageUrl(image.storageKey) : null,
+          imageUrl: image ? publicImageUrl(image.storageKey, image.id) : null,
           imageAlt: image?.alt ? displayName(image.alt) : null,
           seller: displayName(product.seller.businessName),
           estimated:
             product.description?.startsWith("Dados estimados:") ?? false,
           label: displayName(variant.label),
           priceCents: variant.priceCents,
+          compareAtPriceCents:
+            variant.compareAtPriceCents !== null &&
+            variant.compareAtPriceCents > variant.priceCents
+              ? variant.compareAtPriceCents
+              : null,
           available:
             !!variant.inventory &&
             variant.inventory.quantityOnHand >
