@@ -10,10 +10,12 @@ import {
 import { StorefrontAuthLinks } from "@/components/layout/storefront-auth-links";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { PageBackButton } from "@/components/layout/page-back-button";
 import { CartStatus, CartStatusFallback } from "@/features/cart/cart-status";
 import { getSiteLocale, type SiteLocale } from "@/lib/locale";
 
 const getLinks = (locale: SiteLocale) => [
+  { href: "/", label: "Home" },
   { href: "/produtos", label: locale === "en" ? "Products" : "Produtos" },
   {
     href: "/como-funciona",
@@ -67,6 +69,10 @@ export async function StorefrontShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div id="conteudo" className="storefront-content">
+        <PageBackButton
+          label={locale === "en" ? "Back" : "Voltar"}
+          hideOnPrefixes={["/cliente"]}
+        />
         {children}
       </div>
       <FooterContent

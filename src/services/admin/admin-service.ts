@@ -30,7 +30,11 @@ const estimatedFeaturedProductWhere: Prisma.ProductWhereInput = {
   deletedAt: null,
   slug: { not: "semente-pepino-f1-nagano-estimada" },
   OR: [
-    { variants: { some: { deletedAt: null, sku: { startsWith: "EST-FEATURED-" } } } },
+    {
+      variants: {
+        some: { deletedAt: null, sku: { startsWith: "EST-FEATURED-" } },
+      },
+    },
     { slug: { contains: "-estimad" } },
   ],
 };
@@ -121,6 +125,10 @@ export class AdminService {
       payments,
       recentOrders,
       pendingSellers,
+      pendingSellersCount,
+      pendingProducts,
+      pendingDrivers,
+      categories,
     ] = await Promise.all([
       this.db.order.count({ where: realOrderWhere }),
       this.db.seller.count({
@@ -160,6 +168,18 @@ export class AdminService {
           createdAt: true,
         },
       }),
+      this.db.seller.count({
+        where: {
+          AND: [{ status: "PENDING", deletedAt: null }, realSellerWhere],
+        },
+      }),
+      this.db.product.count({
+        where: { AND: [realProductWhere, { status: "PENDING_REVIEW" }] },
+      }),
+      this.db.driver.count({
+        where: { AND: [realDriverWhere, { status: "PENDING" }] },
+      }),
+      this.db.category.count({ where: realCategoryWhere }),
     ]);
     return {
       stats: {
@@ -169,6 +189,10 @@ export class AdminService {
         drivers,
         deliveries,
         paidCents: payments._sum.amountCents ?? 0,
+        pendingSellers: pendingSellersCount,
+        pendingProducts,
+        pendingDrivers,
+        categories,
       },
       recentOrders,
       pendingSellers,
@@ -189,6 +213,7 @@ export class AdminService {
           description: true,
           brand: true,
           status: true,
+          isFeatured: true,
           categoryId: true,
           category: { select: { name: true } },
           seller: { select: { businessName: true } },
@@ -267,6 +292,7 @@ export class AdminService {
       normalPriceCents: number;
       promoPriceCents: number;
       stock: number;
+      isFeatured: boolean;
       images: AdminProductImageInput[];
     },
   ) {
@@ -338,6 +364,7 @@ export class AdminService {
           description: description || null,
           brand: brand || null,
           status,
+          isFeatured: input.isFeatured,
           reviewedAt: status === ProductStatus.ACTIVE ? new Date() : null,
           reviewedById: status === ProductStatus.ACTIVE ? actor.userId : null,
           variants: {
@@ -387,7 +414,43 @@ export class AdminService {
       action: "product.created_by_admin",
       entityType: "Product",
       entityId: product.id,
-      after: { name, sellerId: seller.id, categoryId: category.id, status },
+      after: {
+        name,
+        sellerId: seller.id,
+        categoryId: category.id,
+        status,
+        isFeatured: input.isFeatured,
+      },
+      actor,
+    });
+  }
+
+  async setCatalogProductFeatured(
+    actor: Actor,
+    id: string,
+    isFeatured: boolean,
+  ) {
+    const audit = this.authorize(actor);
+    assertCan(actor, "product:update");
+    if (!uuid.test(id)) throw new Error("Produto inválido.");
+    const product = await this.db.product.findFirst({
+      where: { AND: [{ id }, adminCatalogProductWhere] },
+      select: { id: true, name: true, isFeatured: true },
+    });
+    if (!product) throw new Error("Produto não encontrado no catálogo.");
+    if (product.isFeatured === isFeatured) return;
+    await this.db.product.update({
+      where: { id: product.id },
+      data: { isFeatured },
+    });
+    await audit.log({
+      action: isFeatured
+        ? "product.featured_by_admin"
+        : "product.unfeatured_by_admin",
+      entityType: "Product",
+      entityId: product.id,
+      before: { name: product.name, isFeatured: product.isFeatured },
+      after: { name: product.name, isFeatured },
       actor,
     });
   }
@@ -401,6 +464,7 @@ export class AdminService {
       brand: string;
       categoryId: string;
       status: string;
+      isFeatured: boolean;
       removeImageIds: string[];
       images: AdminProductImageInput[];
     },
@@ -430,7 +494,7 @@ export class AdminService {
     const [product, category] = await Promise.all([
       this.db.product.findFirst({
         where: { AND: [{ id: input.productId }, adminCatalogProductWhere] },
-        select: { id: true, name: true, status: true },
+        select: { id: true, name: true, status: true, isFeatured: true },
       }),
       this.db.category.findFirst({
         where: { AND: [{ id: input.categoryId }, adminCatalogCategoryWhere] },
@@ -451,6 +515,7 @@ export class AdminService {
           description: description || null,
           brand: brand || null,
           status,
+          isFeatured: input.isFeatured,
           reviewedAt: status === ProductStatus.ACTIVE ? new Date() : null,
           reviewedById: status === ProductStatus.ACTIVE ? actor.userId : null,
           rejectionReason: null,
@@ -496,8 +561,17 @@ export class AdminService {
       action: "product.updated_by_admin",
       entityType: "Product",
       entityId: product.id,
-      before: { name: product.name, status: product.status },
-      after: { name, categoryId: category.id, status },
+      before: {
+        name: product.name,
+        status: product.status,
+        isFeatured: product.isFeatured,
+      },
+      after: {
+        name,
+        categoryId: category.id,
+        status,
+        isFeatured: input.isFeatured,
+      },
       actor,
     });
   }
@@ -611,6 +685,33 @@ export class AdminService {
         compareAtPriceCents: prices.compareAtPriceCents,
         stock: input.stock,
       },
+      actor,
+    });
+  }
+
+  async removeCatalogProduct(actor: Actor, id: string) {
+    const audit = this.authorize(actor);
+    assertCan(actor, "product:update");
+    if (!uuid.test(id)) throw new Error("Produto inválido.");
+
+    const product = await this.db.product.findFirst({
+      where: { AND: [{ id }, adminCatalogProductWhere] },
+      select: { id: true, name: true, status: true },
+    });
+    if (!product) throw new Error("Produto não encontrado no catálogo.");
+
+    const removedAt = new Date();
+    await this.db.product.update({
+      where: { id: product.id },
+      data: { deletedAt: removedAt, status: ProductStatus.ARCHIVED },
+    });
+
+    await audit.log({
+      action: "product.removed_by_admin",
+      entityType: "Product",
+      entityId: product.id,
+      before: { name: product.name, status: product.status },
+      after: { name: product.name, status: ProductStatus.ARCHIVED },
       actor,
     });
   }

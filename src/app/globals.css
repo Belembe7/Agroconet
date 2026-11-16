@@ -1463,15 +1463,19 @@
     object-fit: contain;
     transform: scale(1.85);
   }
+  .product-visual img.product-packaging-photo,
+  .catalog-product-image img.product-packaging-photo {
+    transform: scale(2.25);
+  }
   .landing-product-link:hover
     .product-visual.product-visual-packaging
     img.product-packaging-photo {
-    transform: scale(1.88);
+    transform: scale(2.3);
   }
   .catalog-product-card:hover
     .catalog-product-image.catalog-product-image-packaging
     img.product-packaging-photo {
-    transform: scale(1.88);
+    transform: scale(2.3);
   }
   .product-visual > span:not(.stock-label) {
     font-size: 10px;

@@ -15,6 +15,9 @@ type ActionFeedbackFormProps = {
   successMessage: string;
   errorMessage?: string;
   pendingMessage?: string;
+  onSuccess?: () => void;
+  encType?:
+    "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
 };
 
 export function ActionFeedbackForm({
@@ -24,12 +27,15 @@ export function ActionFeedbackForm({
   successMessage,
   errorMessage = "Não foi possível concluir esta ação. Verifique os dados e tente novamente.",
   pendingMessage = "A processar…",
+  onSuccess,
+  encType,
 }: ActionFeedbackFormProps) {
   const [feedback, formAction, pending] = useActionState(
     async (_previous: FeedbackState | null, formData: FormData) => {
       try {
         await action(formData);
         toast.success(successMessage);
+        onSuccess?.();
         return { kind: "success", message: successMessage } as const;
       } catch {
         toast.error(errorMessage);
@@ -40,7 +46,12 @@ export function ActionFeedbackForm({
   );
 
   return (
-    <form action={formAction} className={className} aria-busy={pending}>
+    <form
+      action={formAction}
+      className={className}
+      aria-busy={pending}
+      encType={encType}
+    >
       <fieldset disabled={pending} className="contents">
         {children}
       </fieldset>

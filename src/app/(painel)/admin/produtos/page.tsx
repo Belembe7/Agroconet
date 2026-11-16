@@ -5,31 +5,38 @@ import { prisma } from "@/lib/db";
 import { requireAreaSession } from "@/lib/session";
 import { AdminService } from "@/services/admin/admin-service";
 
-export default function AdminProductsPage() {
+export default function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string | string[] }>;
+}) {
   return (
     <Suspense fallback={<p className="p-6">A carregar produtos…</p>}>
-      <AdminProductsContent />
+      <AdminProductsContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function AdminProductsContent() {
+async function AdminProductsContent({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string | string[] }>;
+}) {
   await connection();
+  const params = await searchParams;
+  const requestedSection = Array.isArray(params.section)
+    ? params.section[0]
+    : params.section;
+  const initialSection =
+    requestedSection === "pendentes"
+      ? "pending"
+      : requestedSection === "categorias"
+        ? "categories"
+        : "products";
   const session = await requireAreaSession("admin");
   const catalog = await new AdminService(prisma).catalogManagement(
     session.actor,
   );
 
-  return (
-    <div className="space-y-6">
-      <header>
-        <p className="text-muted-foreground text-sm">Catálogo público</p>
-        <h1 className="text-2xl font-semibold">Gerenciar Produtos</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Produtos, categorias, imagens, preços, stock e promoções da loja.
-        </p>
-      </header>
-      <AdminCatalogManager {...catalog} />
-    </div>
-  );
+  return <AdminCatalogManager {...catalog} initialSection={initialSection} />;
 }

@@ -123,20 +123,8 @@ const seeds = [
 ] as const;
 
 async function main() {
-  const [category, demoSeller, legacySeller] = await Promise.all([
-    prisma.category.upsert({
-      where: { slug: "sementes" },
-      update: { isActive: true, deletedAt: null },
-      create: { name: "Sementes", slug: "sementes", sortOrder: 1 },
-    }),
-    prisma.seller.findFirst({
-      where: {
-        slug: "demo-agroconet",
-        status: "APPROVED",
-        deletedAt: null,
-        user: { status: "ACTIVE", deletedAt: null },
-      },
-    }),
+  const [category, seller] = await Promise.all([
+    prisma.category.findUnique({ where: { slug: "sementes" } }),
     prisma.seller.findFirst({
       where: {
         slug: "agroconet",
@@ -146,12 +134,12 @@ async function main() {
       },
     }),
   ]);
-  const seller = demoSeller ?? legacySeller;
-  if (!seller) {
+  if (!category || !seller) {
     throw new Error(
-      "The approved demo Agroconet seller (demo-agroconet) is missing.",
+      "The active seeds category or local Agroconet demo seller is missing.",
     );
   }
+
   let created = 0;
   await prisma.product.updateMany({
     where: {

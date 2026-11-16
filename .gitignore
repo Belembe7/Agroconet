@@ -62,3 +62,8 @@ skills-lock.json
 /RestauranteCPP/
 /SaborGest-Restaurante-CPP.zip
 /docs/CONTINUIDADE.md
+
+.vercel/
+.env*
+!.env.example
+/.codex-seeds-import/

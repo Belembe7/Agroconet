@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { AdminService } from "@/services/admin/admin-service";
@@ -66,6 +66,8 @@ async function productImages(formData: FormData, alt: string) {
 }
 
 function refreshCatalog() {
+  updateTag("products");
+  updateTag("landing");
   revalidatePath("/admin");
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
@@ -87,7 +89,7 @@ export async function reviewSellerAction(formData: FormData) {
     approved,
     String(formData.get("reason") ?? ""),
   );
-  revalidatePath("/admin");
+  refreshCatalog();
 }
 
 export async function reviewProductAction(formData: FormData) {
@@ -104,8 +106,7 @@ export async function reviewProductAction(formData: FormData) {
     approved,
     String(formData.get("reason") ?? ""),
   );
-  revalidatePath("/admin");
-  revalidatePath("/admin/produtos");
+  refreshCatalog();
 }
 
 export async function approveDriverAction(formData: FormData) {
@@ -125,9 +126,7 @@ export async function createCategoryAction(formData: FormData) {
     name: String(formData.get("name") ?? ""),
     description: String(formData.get("description") ?? ""),
   });
-  revalidatePath("/admin");
-  revalidatePath("/admin/produtos");
-  revalidatePath("/produtos");
+  refreshCatalog();
 }
 
 export async function setCategoryActiveAction(formData: FormData) {
@@ -143,9 +142,7 @@ export async function setCategoryActiveAction(formData: FormData) {
       return active === "true";
     })(),
   );
-  revalidatePath("/admin");
-  revalidatePath("/admin/produtos");
-  revalidatePath("/produtos");
+  refreshCatalog();
 }
 
 export async function createCatalogProductAction(formData: FormData) {
@@ -168,6 +165,7 @@ export async function createCatalogProductAction(formData: FormData) {
     ),
     promoPriceCents: Math.round(Number(formData.get("promoPrice") ?? 0) * 100),
     stock: Number(formData.get("stock") ?? 0),
+    isFeatured: formData.get("isFeatured") === "on",
     images: await productImages(formData, name),
   });
   refreshCatalog();
@@ -184,12 +182,27 @@ export async function updateCatalogProductAction(formData: FormData) {
     brand: String(formData.get("brand") ?? ""),
     categoryId: String(formData.get("categoryId") ?? ""),
     status: String(formData.get("status") ?? ""),
+    isFeatured: formData.get("isFeatured") === "on",
     removeImageIds: formData
       .getAll("removeImageId")
       .map(String)
       .filter(Boolean),
     images: await productImages(formData, name),
   });
+  refreshCatalog();
+}
+
+export async function setCatalogProductFeaturedAction(formData: FormData) {
+  const session = await getAppSession();
+  if (!session) throw new Error("Sessão necessária.");
+  const featured = String(formData.get("featured") ?? "");
+  if (featured !== "true" && featured !== "false")
+    throw new Error("Estado de destaque inválido.");
+  await new AdminService(prisma).setCatalogProductFeatured(
+    session.actor,
+    String(formData.get("productId") ?? ""),
+    featured === "true",
+  );
   refreshCatalog();
 }
 
@@ -209,5 +222,12 @@ export async function updateCatalogVariantAction(formData: FormData) {
     promoPriceCents: Math.round(Number(formData.get("promoPrice") ?? 0) * 100),
     stock: Number(formData.get("stock") ?? 0),
   });
+  refreshCatalog();
+}
+
+export async function removeCatalogProductAction(productId: string) {
+  const session = await getAppSession();
+  if (!session) throw new Error("Sessão necessária.");
+  await new AdminService(prisma).removeCatalogProduct(session.actor, productId);
   refreshCatalog();
 }

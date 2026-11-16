@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { Brand } from "@/components/layout/brand";
+import { PageBackButton } from "@/components/layout/page-back-button";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -9,9 +8,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="auth-form-side">
         <header>
           <Brand />
-          <Link href="/" className="auth-back">
-            Voltar à loja <ArrowUpRight aria-hidden="true" className="size-4" />
-          </Link>
+          <PageBackButton
+            containerClassName="contents"
+            className="auth-back border-0 bg-transparent px-0"
+          />
         </header>
         <main>{children}</main>
       </div>

@@ -1,12 +1,25 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  Boxes,
+  ClipboardCheck,
+  MapPinned,
+  MessageCircleMore,
+  PackageCheck,
+  UsersRound,
+} from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { displayName } from "@/lib/display-name";
 import { getAppSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { AdminService } from "@/services/admin/admin-service";
 import { DeliveryService } from "@/services/delivery/delivery-service";
-import { approveDriverAction, reviewSellerAction } from "@/features/admin/actions";
+import {
+  approveDriverAction,
+  reviewSellerAction,
+} from "@/features/admin/actions";
 import {
   assignDeliveryAction,
   createZoneAction,
@@ -35,35 +48,192 @@ async function AdminHomeContent() {
     new DeliveryService(prisma).listDispatch(session.actor),
   ]);
   const stats = [
-    ["Encomendas", data.stats.orders],
-    ["Vendedores", data.stats.sellers],
-    ["Produtos", data.stats.products],
-    ["Entregadores", data.stats.drivers],
-    ["Entregas", data.stats.deliveries],
-    ["Recebido", formatPrice(data.stats.paidCents)],
+    {
+      label: "Produtos no catálogo",
+      value: data.stats.products,
+      detail: `${data.stats.pendingProducts} pendente(s) de revisão`,
+      href: "/admin/produtos",
+      icon: PackageCheck,
+    },
+    {
+      label: "Categorias",
+      value: data.stats.categories,
+      detail: "Categorias configuradas",
+      href: "/admin/produtos?section=categorias",
+      icon: Boxes,
+    },
+    {
+      label: "Vendedores",
+      value: data.stats.sellers,
+      detail: `${data.stats.pendingSellers} por aprovar`,
+      href: "#vendedores-pendentes",
+      icon: UsersRound,
+    },
+    {
+      label: "Entregadores",
+      value: data.stats.drivers,
+      detail: `${data.stats.pendingDrivers} por aprovar`,
+      href: "#entregadores-registados",
+      icon: ClipboardCheck,
+    },
+    {
+      label: "Encomendas",
+      value: data.stats.orders,
+      detail: `${data.stats.deliveries} entrega(s) registada(s)`,
+      href: "#despacho-entregas",
+      icon: MapPinned,
+    },
+    {
+      label: "Pagamentos recebidos",
+      value: formatPrice(data.stats.paidCents),
+      detail: "Pagamentos marcados como pagos",
+      href: null,
+      icon: ClipboardCheck,
+    },
   ];
+  const attentionCount =
+    data.stats.pendingProducts +
+    data.stats.pendingSellers +
+    data.stats.pendingDrivers +
+    dispatch.deliveries.length;
+  const attentionHref = data.stats.pendingProducts
+    ? "/admin/produtos?section=pendentes"
+    : data.stats.pendingSellers
+      ? "#vendedores-pendentes"
+      : data.stats.pendingDrivers
+        ? "#entregadores-registados"
+        : "#despacho-entregas";
   return (
-    <div className="space-y-8">
-      <header>
-        <p className="text-muted-foreground text-sm">Operação Agroconet</p>
-        <h1 className="text-2xl font-semibold">Painel administrativo</h1>
+    <div className="space-y-6 lg:space-y-8">
+      <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-primary text-xs font-semibold tracking-[0.14em] uppercase">
+            Agroconet · Administração
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
+            Visão geral da operação
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Acompanhe o catálogo e as tarefas que precisam de atenção.
+          </p>
+        </div>
+        <Link
+          href="/admin/apoio"
+          className="text-primary inline-flex min-h-10 items-center gap-2 self-start text-sm font-medium hover:underline sm:self-auto"
+        >
+          <MessageCircleMore aria-hidden="true" className="size-4" />{" "}
+          Atendimento
+          <ArrowUpRight aria-hidden="true" className="size-4" />
+        </Link>
       </header>
       <section
-        aria-label="Indicadores"
-        className="grid grid-cols-2 gap-3 lg:grid-cols-3"
+        aria-label="Acessos rápidos"
+        className="grid grid-cols-2 gap-2 sm:grid-cols-4"
       >
-        {stats.map(([label, value]) => (
-          <article
-            key={String(label)}
-            className="bg-card rounded-2xl border p-4"
-          >
-            <p className="text-muted-foreground text-sm">{label}</p>
-            <p className="mt-2 text-2xl font-semibold">{value}</p>
-          </article>
-        ))}
+        {[
+          {
+            href: "/admin/produtos",
+            label: "Gerir produtos",
+            icon: PackageCheck,
+          },
+          {
+            href: "/admin/produtos?section=pendentes",
+            label: "Rever produtos",
+            icon: ClipboardCheck,
+          },
+          {
+            href: "/admin/produtos?section=categorias",
+            label: "Gerir categorias",
+            icon: Boxes,
+          },
+          { href: "/entrega", label: "Mapa de entregas", icon: MapPinned },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="bg-card hover:bg-muted/60 focus-visible:outline-ring flex min-h-12 items-center gap-2 rounded-xl border px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4"
+            >
+              <Icon
+                aria-hidden="true"
+                className="text-primary size-4 shrink-0"
+              />
+              <span className="min-w-0 flex-1">{item.label}</span>
+              <ArrowUpRight
+                aria-hidden="true"
+                className="text-muted-foreground size-3.5 shrink-0"
+              />
+            </Link>
+          );
+        })}
+      </section>
+      <section
+        aria-label="Tarefas que precisam de atenção"
+        className={`flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${attentionCount ? "border-amber-300 bg-amber-50/70 dark:border-amber-900 dark:bg-amber-950/20" : "bg-card"}`}
+      >
+        <div>
+          <p className="font-semibold">
+            {attentionCount
+              ? `${attentionCount} tarefa(s) por tratar`
+              : "Tudo em dia"}
+          </p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {data.stats.pendingSellers} vendedor(es),{" "}
+            {data.stats.pendingProducts} produto(s), {data.stats.pendingDrivers}{" "}
+            entregador(es) e {dispatch.deliveries.length} entrega(s) aguardam
+            atenção.
+          </p>
+        </div>
+        <Link
+          href={attentionHref}
+          className="text-primary inline-flex min-h-10 shrink-0 items-center gap-2 text-sm font-medium hover:underline"
+        >
+          Ver tarefas <ArrowUpRight aria-hidden="true" className="size-4" />
+        </Link>
+      </section>
+      <section
+        aria-label="Indicadores"
+        className="grid grid-cols-2 gap-3 xl:grid-cols-3"
+      >
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          const content = (
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-muted-foreground text-sm">{stat.label}</p>
+                <Icon
+                  aria-hidden="true"
+                  className="text-primary size-4 shrink-0"
+                />
+              </div>
+              <p className="mt-2 text-2xl font-semibold">{stat.value}</p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                {stat.detail}
+              </p>
+            </>
+          );
+          const className = "bg-card rounded-2xl border p-4 sm:p-5";
+          return stat.href ? (
+            <Link
+              key={stat.label}
+              href={stat.href}
+              className={`${className} hover:border-primary/40 focus-visible:outline-ring transition-colors focus-visible:outline-2 focus-visible:outline-offset-2`}
+            >
+              {content}
+            </Link>
+          ) : (
+            <article key={stat.label} className={className}>
+              {content}
+            </article>
+          );
+        })}
       </section>
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="bg-card rounded-2xl border p-5">
+        <section
+          id="vendedores-pendentes"
+          className="bg-card rounded-2xl border p-5"
+        >
           <h2 className="mb-4 text-lg font-semibold">
             Vendedores por aprovar ({data.pendingSellers.length})
           </h2>
@@ -104,6 +274,7 @@ async function AdminHomeContent() {
                         name="reason"
                         placeholder="Motivo"
                         maxLength={500}
+                        required
                         aria-label="Motivo da rejeição"
                         className="w-28"
                       />
@@ -121,7 +292,10 @@ async function AdminHomeContent() {
             </p>
           )}
         </section>
-        <section className="bg-card rounded-2xl border p-5">
+        <section
+          id="despacho-entregas"
+          className="bg-card rounded-2xl border p-5"
+        >
           <h2 className="mb-4 text-lg font-semibold">Despacho de entregas</h2>
           {dispatch.deliveries.length ? (
             <ul className="divide-y">
@@ -196,18 +370,21 @@ async function AdminHomeContent() {
             <Input
               name="name"
               placeholder="Nome da zona"
+              aria-label="Nome da zona"
               required
               minLength={2}
             />
             <Input
               name="province"
               placeholder="Província"
+              aria-label="Província da zona"
               required
               minLength={2}
             />
             <Input
               name="areas"
               placeholder="Bairros separados por vírgula"
+              aria-label="Bairros da zona, separados por vírgula"
               required
               className="sm:col-span-2"
             />
@@ -222,7 +399,10 @@ async function AdminHomeContent() {
         </section>
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="bg-card rounded-2xl border p-5">
+        <section
+          id="encomendas-recentes"
+          className="bg-card rounded-2xl border p-5"
+        >
           <h2 className="mb-4 text-lg font-semibold">Encomendas recentes</h2>
           {data.recentOrders.length ? (
             <ul className="divide-y">
@@ -270,7 +450,10 @@ async function AdminHomeContent() {
           )}
         </section>
       </div>
-      <section className="bg-card space-y-4 rounded-2xl border p-5">
+      <section
+        id="entregadores-registados"
+        className="bg-card space-y-4 rounded-2xl border p-5"
+      >
         <h2 className="text-lg font-semibold">Entregadores registados</h2>
         {operations.drivers.length ? (
           <ul className="grid gap-2 sm:grid-cols-2">

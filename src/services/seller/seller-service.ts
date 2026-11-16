@@ -26,6 +26,46 @@ function slugify(value: string) {
     .replace(/^-|-$/g, "");
 }
 
+export type SellerProductImageInput = { storageKey: string; alt: string };
+
+function sellerProductPrices(
+  normalPriceCents: number,
+  promoPriceCents: number,
+) {
+  if (
+    !Number.isSafeInteger(normalPriceCents) ||
+    normalPriceCents < 1 ||
+    normalPriceCents > 100_000_000
+  )
+    throw new Error("Indique um preço normal válido.");
+  if (promoPriceCents === 0)
+    return { priceCents: normalPriceCents, compareAtPriceCents: null };
+  if (
+    !Number.isSafeInteger(promoPriceCents) ||
+    promoPriceCents < 1 ||
+    promoPriceCents >= normalPriceCents
+  )
+    throw new Error("O preço promocional deve ser menor que o preço normal.");
+  return {
+    priceCents: promoPriceCents,
+    compareAtPriceCents: normalPriceCents,
+  };
+}
+
+function validateSellerImages(images: SellerProductImageInput[]) {
+  if (images.length > 4)
+    throw new Error("Pode enviar no máximo quatro fotos por vez.");
+  for (const image of images) {
+    if (
+      image.storageKey.length > 2_100_000 ||
+      !/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(
+        image.storageKey,
+      )
+    )
+      throw new Error("Uma das fotos não tem um formato suportado.");
+  }
+}
+
 export class SellerService {
   constructor(private readonly db: PrismaClient) {}
 
@@ -57,12 +97,12 @@ export class SellerService {
           description: true,
           brand: true,
           status: true,
+          isFeatured: true,
           rejectionReason: true,
           category: { select: { name: true } },
           images: {
             select: { id: true, storageKey: true, alt: true },
             orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }],
-            take: 1,
           },
           variants: {
             where: { deletedAt: null },
@@ -70,7 +110,11 @@ export class SellerService {
               id: true,
               label: true,
               sku: true,
+              unit: true,
+              unitSize: true,
               priceCents: true,
+              compareAtPriceCents: true,
+              lowStockThreshold: true,
               inventory: {
                 select: { quantityOnHand: true, quantityReserved: true },
               },
@@ -126,9 +170,13 @@ export class SellerService {
       label: string;
       unit: string;
       unitSize: number;
-      priceCents: number;
+      normalPriceCents: number;
+      promoPriceCents: number;
+      lowStockThreshold: number;
       sku: string;
       startingStock: number;
+      isFeatured: boolean;
+      images: SellerProductImageInput[];
     },
   ) {
     const id = sellerId(actor);
@@ -140,22 +188,29 @@ export class SellerService {
       name.length > 120 ||
       !label ||
       label.length > 120 ||
-      !sku ||
-      sku.length > 80 ||
+      !/^[A-Z0-9][A-Z0-9._-]{0,79}$/.test(sku) ||
       !uuid.test(input.categoryId)
     )
       throw new Error("Preencha os campos obrigatórios do produto.");
     if (input.brand.length > 100 || input.description.length > 2000)
       throw new Error("Marca ou descrição excede o limite permitido.");
     if (
-      !Number.isSafeInteger(input.priceCents) ||
-      input.priceCents < 1 ||
       !Number.isSafeInteger(input.startingStock) ||
       input.startingStock < 0 ||
+      input.startingStock > 1_000_000 ||
+      !Number.isSafeInteger(input.lowStockThreshold) ||
+      input.lowStockThreshold < 0 ||
+      input.lowStockThreshold > 1_000_000 ||
       !Number.isFinite(input.unitSize) ||
-      input.unitSize <= 0
+      input.unitSize <= 0 ||
+      input.unitSize > 1_000_000
     )
       throw new Error("Preço, quantidade e unidade precisam ser válidos.");
+    const prices = sellerProductPrices(
+      input.normalPriceCents,
+      input.promoPriceCents,
+    );
+    validateSellerImages(input.images);
     if (
       !(["KG", "G", "L", "ML", "BAG", "UNIT", "BOX"] as string[]).includes(
         input.unit,
@@ -192,6 +247,7 @@ export class SellerService {
           description: input.description.trim() || null,
           brand: input.brand.trim() || null,
           status,
+          isFeatured: input.isFeatured,
           variants: {
             create: {
               sku,
@@ -199,9 +255,18 @@ export class SellerService {
               unit: input.unit as
                 "KG" | "G" | "L" | "ML" | "BAG" | "UNIT" | "BOX",
               unitSize: input.unitSize,
-              priceCents: input.priceCents,
+              ...prices,
+              lowStockThreshold: input.lowStockThreshold,
               isDefault: true,
             },
+          },
+          images: {
+            create: input.images.map((image, index) => ({
+              storageKey: image.storageKey,
+              alt: image.alt.slice(0, 200) || name,
+              sortOrder: index,
+              isPrimary: index === 0,
+            })),
           },
         },
         select: { variants: { select: { id: true } } },
@@ -270,7 +335,14 @@ export class SellerService {
       brand: string;
       categoryId: string;
       label: string;
-      priceCents: number;
+      sku: string;
+      unit: string;
+      unitSize: number;
+      normalPriceCents: number;
+      promoPriceCents: number;
+      lowStockThreshold: number;
+      images: SellerProductImageInput[];
+      replaceImages: boolean;
     },
   ) {
     const id = sellerId(actor);
@@ -281,6 +353,7 @@ export class SellerService {
     )
       throw new Error("Produto inválido.");
     const name = input.name.trim();
+    const sku = input.sku.trim().toUpperCase();
     if (
       name.length < 3 ||
       name.length > 120 ||
@@ -288,10 +361,23 @@ export class SellerService {
       input.label.trim().length > 120 ||
       input.brand.length > 100 ||
       input.description.length > 2000 ||
-      !Number.isSafeInteger(input.priceCents) ||
-      input.priceCents < 1
+      !/^[A-Z0-9][A-Z0-9._-]{0,79}$/.test(sku) ||
+      !(["KG", "G", "L", "ML", "BAG", "UNIT", "BOX"] as string[]).includes(
+        input.unit,
+      ) ||
+      !Number.isFinite(input.unitSize) ||
+      input.unitSize <= 0 ||
+      input.unitSize > 1_000_000 ||
+      !Number.isSafeInteger(input.lowStockThreshold) ||
+      input.lowStockThreshold < 0 ||
+      input.lowStockThreshold > 1_000_000
     )
-      throw new Error("Revise o nome, variante e preço.");
+      throw new Error("Revise os dados, a unidade, o SKU e os preços.");
+    const prices = sellerProductPrices(
+      input.normalPriceCents,
+      input.promoPriceCents,
+    );
+    validateSellerImages(input.images);
     const [owned, category] = await Promise.all([
       this.db.product.findFirst({
         where: {
@@ -309,8 +395,14 @@ export class SellerService {
     ]);
     if (!owned) throw new Error("Produto não encontrado neste catálogo.");
     if (!category) throw new Error("Categoria inativa ou inválida.");
-    await this.db.$transaction([
-      this.db.product.update({
+    const skuConflict = await this.db.productVariant.findUnique({
+      where: { sku },
+      select: { id: true },
+    });
+    if (skuConflict && skuConflict.id !== input.variantId)
+      throw new Error("Este SKU já está a ser usado por outro produto.");
+    await this.db.$transaction(async (tx) => {
+      await tx.product.update({
         where: { id: owned.id },
         data: {
           name,
@@ -322,12 +414,103 @@ export class SellerService {
           reviewedById: null,
           rejectionReason: null,
         },
-      }),
-      this.db.productVariant.update({
+      });
+      await tx.productVariant.update({
         where: { id: input.variantId },
-        data: { label: input.label.trim(), priceCents: input.priceCents },
-      }),
-    ]);
+        data: {
+          label: input.label.trim(),
+          sku,
+          unit: input.unit as "KG" | "G" | "L" | "ML" | "BAG" | "UNIT" | "BOX",
+          unitSize: input.unitSize,
+          ...prices,
+          lowStockThreshold: input.lowStockThreshold,
+        },
+      });
+      if (input.replaceImages) {
+        await tx.productImage.deleteMany({ where: { productId: owned.id } });
+        if (input.images.length)
+          await tx.productImage.createMany({
+            data: input.images.map((image, index) => ({
+              productId: owned.id,
+              storageKey: image.storageKey,
+              alt: image.alt.slice(0, 200) || name,
+              sortOrder: index,
+              isPrimary: index === 0,
+            })),
+          });
+      }
+    });
+  }
+
+  async setProductActive(actor: Actor, productId: string, active: boolean) {
+    const id = sellerId(actor);
+    if (!uuid.test(productId)) throw new Error("Produto inválido.");
+    const product = await this.db.product.findFirst({
+      where: { id: productId, sellerId: id, deletedAt: null },
+      select: { id: true, status: true },
+    });
+    if (!product) throw new Error("Produto não encontrado neste catálogo.");
+    if (active) {
+      const seller = await this.db.seller.findFirst({
+        where: { id, status: "APPROVED", deletedAt: null },
+        select: { id: true },
+      });
+      if (!seller)
+        throw new Error(
+          "A loja precisa estar aprovada para reativar produtos.",
+        );
+      if (product.status !== ProductStatus.INACTIVE)
+        throw new Error("Este produto não está suspenso.");
+      await this.db.product.update({
+        where: { id: product.id },
+        data: {
+          status: ProductStatus.PENDING_REVIEW,
+          reviewedAt: null,
+          reviewedById: null,
+          rejectionReason: null,
+        },
+      });
+      return;
+    }
+    if (product.status === ProductStatus.INACTIVE)
+      throw new Error("Este produto já está suspenso.");
+    if (product.status === ProductStatus.ARCHIVED)
+      throw new Error("Um produto arquivado não pode ser suspenso.");
+    await this.db.product.update({
+      where: { id: product.id },
+      data: { status: ProductStatus.INACTIVE },
+    });
+  }
+
+  async setProductFeatured(
+    actor: Actor,
+    productId: string,
+    isFeatured: boolean,
+  ) {
+    const id = sellerId(actor);
+    if (!uuid.test(productId)) throw new Error("Produto inválido.");
+    const product = await this.db.product.findFirst({
+      where: { id: productId, sellerId: id, deletedAt: null },
+      select: { id: true, name: true, isFeatured: true },
+    });
+    if (!product) throw new Error("Produto não encontrado neste catálogo.");
+    if (product.isFeatured === isFeatured) return;
+    await this.db.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: product.id },
+        data: { isFeatured },
+      });
+      await new AuditService(tx as unknown as PrismaClient).log({
+        action: isFeatured
+          ? "product.featured_by_seller"
+          : "product.unfeatured_by_seller",
+        entityType: "Product",
+        entityId: product.id,
+        before: { name: product.name, isFeatured: product.isFeatured },
+        after: { name: product.name, isFeatured },
+        actor,
+      });
+    });
   }
 
   async updateProfile(

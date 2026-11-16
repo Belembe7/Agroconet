@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { PageBackButton } from "@/components/layout/page-back-button";
 
 export default function NotFound() {
   return (
@@ -8,9 +7,7 @@ export default function NotFound() {
       <p className="text-muted-foreground mt-2">
         O endereço pedido não existe.
       </p>
-      <Button className="mt-6" nativeButton={false} render={<Link href="/" />}>
-        Voltar ao início
-      </Button>
+      <PageBackButton containerClassName="mt-6" fallbackHref="/" />
     </main>
   );
 }

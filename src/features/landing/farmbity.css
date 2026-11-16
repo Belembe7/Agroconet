@@ -1425,7 +1425,7 @@
   }
 
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .footer-updates-cta {
@@ -1433,7 +1433,11 @@
   }
 
   .footer-grid > div:first-child {
-    grid-column: auto;
+    grid-column: 1 / -1;
+  }
+
+  .footer-grid > div:last-child {
+    grid-column: 1 / -1;
   }
 }
 
@@ -3126,6 +3130,10 @@ body {
       grid-column: 1 / -1;
     }
 
+    .footer-grid > div:last-child {
+      grid-column: 1 / -1;
+    }
+
     .footer-bottom {
       flex-direction: column;
       gap: 8px;
@@ -3301,11 +3309,11 @@ body {
     }
 
     .footer-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .footer-grid > div:first-child {
-      grid-column: auto;
+      grid-column: 1 / -1;
     }
 
     .farm-contact-card {

@@ -4,8 +4,10 @@ O painel `/admin` consulta dados reais da base de dados e exige sessão com pape
 
 ## Disponível
 
-- Indicadores de pedidos, vendedores, produtos, entregas, entregadores e pagamentos marcados como pagos.
+- Indicadores de pedidos, vendedores, produtos, categorias, entregas, entregadores e pagamentos marcados como pagos; contagem de pendências para priorizar tarefas.
 - Aprovação e rejeição de vendedores e produtos pendentes, com motivo de rejeição e registo no `AuditLog`.
+- Pesquisa, filtros por categoria e estado, paginação, visualização e edição do catálogo de produtos.
+- Remoção lógica de produtos: o produto passa a arquivado e deixa de aparecer no catálogo público; o registo e o histórico são preservados e a operação é auditada.
 - Consulta de pedidos recentes, eventos de auditoria, categorias, definições e entregadores.
 - Aprovação de perfis de entregador pendentes.
 - Criação de zonas com província, áreas e taxa base; despacho manual e reatribuição de entregas falhadas para entregadores activos da zona.

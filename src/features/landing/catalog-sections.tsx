@@ -1,12 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { connection } from "next/server";
-import { ArrowUpRight, Package, Sprout, ArrowRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  Sprout,
+  ArrowRight,
+} from "lucide-react";
 import {
   getLandingCategories,
   getLandingHighlights,
 } from "@/features/landing/data";
-import { normalizeLandingQuery } from "@/services/catalog/landing-service";
+import {
+  normalizeLandingPage,
+  normalizeLandingQuery,
+} from "@/services/catalog/landing-service";
 import { PriceTag } from "@/components/shared/price-tag";
 import { ProductFallbackPhoto } from "@/components/shared/product-fallback-photo";
 import { productImageAsset } from "@/lib/product-image";
@@ -19,6 +29,7 @@ import { localizeCategory, type SiteLocale } from "@/lib/locale";
 export type LandingSearchParams = Promise<{
   q?: string | string[];
   categoria?: string | string[];
+  pagina?: string | string[];
 }>;
 export function CatalogLoading() {
   return (
@@ -106,10 +117,12 @@ export async function LandingHighlights({
 }) {
   const english = locale === "en";
   await connection();
-  const query = normalizeLandingQuery(await searchParams);
-  let products;
+  const params = await searchParams;
+  const query = normalizeLandingQuery(params);
+  const page = normalizeLandingPage(params.pagina);
+  let result;
   try {
-    products = await getLandingHighlights(query.q, query.category);
+    result = await getLandingHighlights(query.q, query.category, page);
   } catch {
     return (
       <ErrorState
@@ -132,6 +145,15 @@ export async function LandingHighlights({
       />
     );
   }
+  const products = result.products;
+  const pageHref = (nextPage: number) => {
+    const search = new URLSearchParams();
+    if (query.q) search.set("q", query.q);
+    if (query.category) search.set("categoria", query.category);
+    if (nextPage > 1) search.set("pagina", String(nextPage));
+    const queryString = search.toString();
+    return `/${queryString ? `?${queryString}` : ""}#destaques`;
+  };
   return (
     <>
       <div className="catalog-results-bar">
@@ -145,8 +167,8 @@ export async function LandingHighlights({
                 ? "Products in the selected category"
                 : "Produtos da categoria seleccionada"
               : english
-                ? "A selection of the most recently published products."
-                : "Uma selecção dos produtos publicados mais recentemente."}
+                ? "Featured and recently published products."
+                : "Produtos em destaque e publicados recentemente."}
         </p>
         {(query.q || query.category) && (
           <Link href="/produtos">
@@ -155,6 +177,43 @@ export async function LandingHighlights({
           </Link>
         )}
       </div>
+      {result.total > result.pageSize ? (
+        <nav
+          aria-label={english ? "Featured products pages" : "Mais produtos"}
+          className="flex flex-wrap items-center justify-between gap-3 py-4"
+        >
+          <p className="text-muted-foreground text-sm">
+            {english ? "Products" : "Produtos"}{" "}
+            {(result.page - 1) * result.pageSize + 1}–
+            {Math.min(result.page * result.pageSize, result.total)}{" "}
+            {english ? "of" : "de"} {result.total}
+          </p>
+          <div className="flex items-center gap-2">
+            {result.page > 1 ? (
+              <Link
+                href={pageHref(result.page - 1)}
+                aria-label={
+                  english ? "Previous products" : "Produtos anteriores"
+                }
+                className="border-input hover:bg-accent inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 text-sm font-medium"
+              >
+                <ChevronLeft aria-hidden="true" className="size-4" />
+                {english ? "Previous" : "Anterior"}
+              </Link>
+            ) : null}
+            {result.page < result.totalPages ? (
+              <Link
+                href={pageHref(result.page + 1)}
+                aria-label={english ? "See more products" : "Ver mais produtos"}
+                className="border-input hover:bg-accent inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 text-sm font-medium"
+              >
+                {english ? "More products" : "Mais produtos"}
+                <ChevronRight aria-hidden="true" className="size-4" />
+              </Link>
+            ) : null}
+          </div>
+        </nav>
+      ) : null}
       {!products.length ? (
         <EmptyState
           title={
@@ -206,6 +265,11 @@ export async function LandingHighlights({
                         : "product-visual"
                     }
                   >
+                    {product.isFeatured ? (
+                      <span className="absolute top-3 left-3 z-10 rounded-full bg-amber-300 px-3 py-1 text-xs font-semibold text-amber-950">
+                        {english ? "Featured" : "Destaque"}
+                      </span>
+                    ) : null}
                     {imageUrl ? (
                       <Image
                         src={imageUrl}
@@ -297,8 +361,8 @@ export async function LandingHighlights({
             ? "These seed highlights use estimated prices, package sizes and stock. Sellers are still to be confirmed; contact us before ordering."
             : "Estes destaques de sementes têm preços, embalagens e stock estimados. Os fornecedores estão por confirmar; contacte-nos antes de encomendar."
           : english
-            ? "Up to 8 highlights per search. Prices and availability are subject to confirmation. Contact us below if you have any questions."
-            : "Até 8 destaques por pesquisa. Preços e disponibilidade sujeitos a confirmação. Para esclarecer dúvidas, fale connosco nos contactos abaixo."}
+            ? "Up to 8 products per page. Use the arrows to explore the rest of the catalogue. Prices and availability are subject to confirmation."
+            : "Até 8 produtos por página. Use as setas para explorar o restante catálogo. Preços e disponibilidade sujeitos a confirmação."}
       </p>
     </>
   );

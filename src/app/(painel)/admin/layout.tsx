@@ -1,6 +1,5 @@
 import { Suspense, type ReactNode } from "react";
 import { AreaLoading } from "@/components/layout/area-loading";
-import { AdminBackButton } from "@/components/layout/admin-back-button";
 import { AreaShell } from "@/components/layout/area-shell";
 import { requireAreaSession } from "@/lib/session";
 
@@ -14,7 +13,6 @@ async function ProtectedArea({ children }: { children: ReactNode }) {
       subtitle="Área reservada a administradores"
       userName={session.user.name}
     >
-      <AdminBackButton />
       {children}
     </AreaShell>
   );

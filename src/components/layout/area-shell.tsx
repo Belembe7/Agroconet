@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { LayoutDashboard, Store, Truck, UserRound } from "lucide-react";
+import {
+  Boxes,
+  ClipboardList,
+  LayoutDashboard,
+  PackagePlus,
+  Store,
+  Truck,
+  UserRound,
+} from "lucide-react";
 import { Brand } from "@/components/layout/brand";
 import { AreaBackButton } from "@/components/layout/area-back-button";
 import { LogoutButton } from "@/features/auth/logout-button";
@@ -29,6 +37,25 @@ export function AreaShell({
   const item = areas[area];
   const Icon = item.icon;
   const panel = area === "admin" || area === "vendedor";
+  const sellerNavigation = [
+    { href: "/vendedor#resumo", label: "Resumo", icon: LayoutDashboard },
+    { href: "/vendedor#perfil", label: "Perfil comercial", icon: Store },
+    {
+      href: "/vendedor#catalogo",
+      label: "Adicionar produto",
+      icon: PackagePlus,
+    },
+    {
+      href: "/vendedor#products-heading",
+      label: "Gestão de produtos",
+      icon: Boxes,
+    },
+    {
+      href: "/vendedor#orders-heading",
+      label: "Encomendas",
+      icon: ClipboardList,
+    },
+  ];
   return (
     <div className="area-shell bg-background flex min-h-screen flex-1">
       <a
@@ -37,16 +64,34 @@ export function AreaShell({
       >
         Saltar para o conteúdo
       </a>
-      {panel && (
+      {area === "admin" ? (
+        <AdminPanelNavigation title={title} />
+      ) : panel ? (
         <aside className="border-sidebar-border bg-sidebar text-sidebar-foreground hidden w-64 shrink-0 flex-col border-r p-6 md:flex">
           <Brand />
           <p className="mt-10 mb-3 text-xs tracking-widest uppercase">
             {title}
           </p>
-          {area === "admin" ? (
-            <AdminPanelNavigation />
-          ) : (
-            <nav aria-label="Navegação do painel">
+          <nav aria-label="Navegação do painel">
+            <Link
+              href="/"
+              className="hover:bg-sidebar-accent/60 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm"
+            >
+              <Store aria-hidden="true" className="size-4" />
+              Home
+            </Link>
+            {area === "vendedor" ? (
+              sellerNavigation.map(({ href, label, icon: NavigationIcon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="hover:bg-sidebar-accent/60 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm"
+                >
+                  <NavigationIcon aria-hidden="true" className="size-4" />
+                  {label}
+                </Link>
+              ))
+            ) : (
               <Link
                 aria-current="page"
                 href={item.href}
@@ -55,30 +100,24 @@ export function AreaShell({
                 <Icon aria-hidden="true" className="size-4" />
                 {item.label}
               </Link>
-            </nav>
-          )}
-          <Link
-            href="/"
-            className="mt-auto flex min-h-11 items-center text-sm underline underline-offset-4"
-          >
-            Voltar à loja
-          </Link>
+            )}
+          </nav>
         </aside>
-      )}
+      ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="bg-card border-b px-4 py-4 sm:px-8">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              {area !== "admin" && (
-                <AreaBackButton
-                  areaHomeHref={item.href}
-                  returnLabel={
-                    area === "cliente"
-                      ? "Voltar à minha conta"
+              <AreaBackButton
+                areaHomeHref={item.href}
+                returnLabel={
+                  area === "cliente"
+                    ? "Voltar à minha conta"
+                    : area === "admin"
+                      ? "Voltar à administração"
                       : "Voltar ao painel"
-                  }
-                />
-              )}
+                }
+              />
               <div className="min-w-0">
                 <p className="font-heading text-xl font-semibold">{title}</p>
                 <p className="text-muted-foreground text-sm">{subtitle}</p>
@@ -98,22 +137,38 @@ export function AreaShell({
           ) : (
             <nav
               aria-label="Navegação móvel"
-              className="bg-card border-b px-4 md:hidden"
+              className="bg-card flex gap-5 overflow-x-auto border-b px-4 md:hidden"
             >
               <Link
-                href={item.href}
-                aria-current="page"
-                className="inline-flex min-h-11 items-center gap-2 text-sm"
-              >
-                <Icon aria-hidden="true" className="size-4" />
-                {item.label}
-              </Link>
-              <Link
                 href="/"
-                className="ml-6 inline-flex min-h-11 items-center text-sm underline"
+                className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm"
               >
-                Loja
+                <Store aria-hidden="true" className="size-4" />
+                Home
               </Link>
+              {area === "vendedor" ? (
+                sellerNavigation.map(
+                  ({ href, label, icon: NavigationIcon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm"
+                    >
+                      <NavigationIcon aria-hidden="true" className="size-4" />
+                      {label}
+                    </Link>
+                  ),
+                )
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current="page"
+                  className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm"
+                >
+                  <Icon aria-hidden="true" className="size-4" />
+                  {item.label}
+                </Link>
+              )}
             </nav>
           ))}
         <main
@@ -128,19 +183,19 @@ export function AreaShell({
             className="bg-card fixed inset-x-0 bottom-0 flex justify-around border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
           >
             <Link
+              href="/"
+              className="flex min-h-14 flex-col items-center justify-center gap-1 text-sm"
+            >
+              <Store aria-hidden="true" className="size-5" />
+              Home
+            </Link>
+            <Link
               href="/entregador"
               aria-current="page"
               className="text-primary flex min-h-14 flex-col items-center justify-center gap-1 text-sm font-medium"
             >
               <Truck aria-hidden="true" className="size-5" />
               Entregas
-            </Link>
-            <Link
-              href="/"
-              className="flex min-h-14 flex-col items-center justify-center gap-1 text-sm"
-            >
-              <Store aria-hidden="true" className="size-5" />
-              Loja
             </Link>
             <Link
               href="/entrega"

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import { connection } from "next/server";
-import { Package } from "lucide-react";
+import { Package, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NumericInput } from "@/components/ui/numeric-input";
@@ -18,6 +18,8 @@ import { SellerService } from "@/services/seller/seller-service";
 import {
   adjustSellerStockAction,
   createSellerProductAction,
+  setSellerProductActiveAction,
+  setSellerProductFeaturedAction,
   updateSellerOrderAction,
   updateSellerProductAction,
   updateSellerProfileAction,
@@ -124,9 +126,13 @@ async function VendedorHomeContent() {
   const activeProducts = data.products.filter(
     (product) => product.status === "ACTIVE",
   ).length;
+  const sellerCanPublish = data.seller.status === "APPROVED";
   return (
     <div className="space-y-8">
-      <section className="flex flex-wrap items-end justify-between gap-4">
+      <section
+        id="resumo"
+        className="flex scroll-mt-6 flex-wrap items-end justify-between gap-4"
+      >
         <div>
           <p className="text-muted-foreground text-sm">O meu negócio</p>
           <h1 className="font-heading mt-1 text-3xl font-semibold">
@@ -262,10 +268,20 @@ async function VendedorHomeContent() {
           </p>
         </CardHeader>
         <CardContent>
-          {categories.length ? (
+          {!sellerCanPublish ? (
+            <p
+              role="status"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
+            >
+              {data.seller.status === "PENDING"
+                ? "A candidatura da sua loja está em análise. Poderá enviar produtos para revisão depois da aprovação."
+                : "O perfil da sua loja não está aprovado. Contacte a Agroconet para saber como voltar a publicar produtos."}
+            </p>
+          ) : categories.length ? (
             <ActionFeedbackForm
               action={createSellerProductAction}
               className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              encType="multipart/form-data"
               successMessage="Produto enviado para revisão."
               errorMessage="Não foi possível criar o produto. Verifique os dados e tente novamente."
             >
@@ -341,13 +357,22 @@ async function VendedorHomeContent() {
                   required
                 />
               </Field>
-              <Field label="Preço (Mzn)">
+              <Field label="Preço normal (MZN)">
                 <NumericInput
                   className={inputClass}
-                  name="price"
+                  name="normalPrice"
                   min="0.01"
                   step="0.01"
                   required
+                />
+              </Field>
+              <Field label="Preço promocional (opcional, MZN)">
+                <NumericInput
+                  className={inputClass}
+                  name="promoPrice"
+                  min="0"
+                  step="0.01"
+                  defaultValue="0"
                 />
               </Field>
               <Field label="Stock inicial">
@@ -360,6 +385,37 @@ async function VendedorHomeContent() {
                   required
                 />
               </Field>
+              <Field label="Avisar quando o stock chegar a">
+                <NumericInput
+                  className={inputClass}
+                  name="lowStockThreshold"
+                  min="0"
+                  max="1000000"
+                  step="1"
+                  defaultValue="5"
+                  required
+                />
+              </Field>
+              <Field label="Fotos do produto (até 4)">
+                <input
+                  className={`${inputClass} py-2`}
+                  type="file"
+                  name="images"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                />
+              </Field>
+              <p className="text-muted-foreground self-end text-xs">
+                PNG, JPEG ou WebP; até 1,5 MB por foto e 3 MB no total.
+              </p>
+              <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
+                <input
+                  className="accent-primary size-4"
+                  type="checkbox"
+                  name="isFeatured"
+                />
+                Promover para destaque na página inicial
+              </label>
               <div className="flex items-end">
                 <Button type="submit">Enviar para revisão</Button>
               </div>
@@ -373,7 +429,10 @@ async function VendedorHomeContent() {
         </CardContent>
       </Card>
 
-      <section className="space-y-4" aria-labelledby="products-heading">
+      <section
+        className="scroll-mt-6 space-y-4"
+        aria-labelledby="products-heading"
+      >
         <div>
           <h2
             id="products-heading"
@@ -411,13 +470,72 @@ async function VendedorHomeContent() {
                         )}
                       </div>
                     </div>
-                    <Badge
-                      variant={
-                        product.status === "ACTIVE" ? "default" : "secondary"
-                      }
-                    >
-                      {productStatus[product.status]}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ActionFeedbackForm
+                        action={setSellerProductFeaturedAction}
+                        className="inline-flex"
+                        successMessage={
+                          product.isFeatured
+                            ? "Destaque removido do produto."
+                            : "Produto promovido para destaque."
+                        }
+                        errorMessage="Não foi possível alterar o destaque do produto."
+                      >
+                        <input
+                          type="hidden"
+                          name="productId"
+                          value={product.id}
+                        />
+                        <input
+                          type="hidden"
+                          name="featured"
+                          value={String(!product.isFeatured)}
+                        />
+                        <Button type="submit" variant="outline" size="sm">
+                          <Star
+                            aria-hidden="true"
+                            className={product.isFeatured ? "fill-current" : ""}
+                          />
+                          {product.isFeatured ? "Remover destaque" : "Destacar"}
+                        </Button>
+                      </ActionFeedbackForm>
+                      <Badge
+                        variant={
+                          product.status === "ACTIVE" ? "default" : "secondary"
+                        }
+                      >
+                        {productStatus[product.status]}
+                      </Badge>
+                      {product.status !== "ARCHIVED" && (
+                        <ActionFeedbackForm
+                          action={setSellerProductActiveAction}
+                          successMessage={
+                            product.status === "INACTIVE"
+                              ? "Produto reenviado para revisão."
+                              : "Produto suspenso no catálogo."
+                          }
+                          errorMessage="Não foi possível alterar o estado do produto. Atualize o painel e tente novamente."
+                        >
+                          <input
+                            type="hidden"
+                            name="productId"
+                            value={product.id}
+                          />
+                          <input
+                            type="hidden"
+                            name="active"
+                            value={
+                              product.status === "INACTIVE" ? "true" : "false"
+                            }
+                          />
+                          <Button type="submit" variant="outline" size="sm">
+                            {product.status === "INACTIVE"
+                              ? "Reativar produto"
+                              : "Suspender produto"}
+                          </Button>
+                        </ActionFeedbackForm>
+                      )}
+                    </div>
                   </div>
                   <div className="mt-4 divide-y">
                     {product.variants.map((variant, index) => {
@@ -429,14 +547,23 @@ async function VendedorHomeContent() {
                             <div>
                               <p className="text-sm font-medium">
                                 {displayName(variant.label)} ·{" "}
+                                {variant.unitSize.toString()} {variant.unit} ·{" "}
                                 {formatPrice(variant.priceCents)}
+                                {variant.compareAtPriceCents &&
+                                  variant.compareAtPriceCents >
+                                    variant.priceCents && (
+                                    <span className="text-muted-foreground ml-2 text-xs line-through">
+                                      {formatPrice(variant.compareAtPriceCents)}
+                                    </span>
+                                  )}
                               </p>
                               <p className="text-muted-foreground text-xs">
                                 {variant.sku.toUpperCase().startsWith("DEV-")
                                   ? "SKU não definido"
                                   : `SKU ${displayName(variant.sku)}`}{" "}
                                 · {onHand - reserved} disponíveis ({reserved}{" "}
-                                reservadas)
+                                reservadas) · alerta em{" "}
+                                {variant.lowStockThreshold}
                               </p>
                             </div>
                             <ActionFeedbackForm
@@ -488,6 +615,7 @@ async function VendedorHomeContent() {
                               <ActionFeedbackForm
                                 action={updateSellerProductAction}
                                 className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                                encType="multipart/form-data"
                                 successMessage="Produto atualizado e reenviado para revisão."
                                 errorMessage="Não foi possível atualizar o produto. Verifique os campos e tente novamente."
                               >
@@ -563,18 +691,102 @@ async function VendedorHomeContent() {
                                     required
                                   />
                                 </Field>
-                                <Field label="Preço (Mzn)">
+                                <Field label="SKU">
+                                  <input
+                                    className={inputClass}
+                                    name="sku"
+                                    defaultValue={variant.sku}
+                                    maxLength={80}
+                                    required
+                                  />
+                                </Field>
+                                <Field label="Unidade">
+                                  <select
+                                    className={inputClass}
+                                    name="unit"
+                                    defaultValue={variant.unit}
+                                  >
+                                    {units.map((unit) => (
+                                      <option
+                                        key={unit.value}
+                                        value={unit.value}
+                                      >
+                                        {unit.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </Field>
+                                <Field label="Tamanho da unidade">
                                   <NumericInput
                                     className={inputClass}
-                                    name="price"
+                                    name="unitSize"
+                                    defaultValue={variant.unitSize.toString()}
+                                    min="0.0001"
+                                    step="0.0001"
+                                    required
+                                  />
+                                </Field>
+                                <Field label="Preço normal (MZN)">
+                                  <NumericInput
+                                    className={inputClass}
+                                    name="normalPrice"
                                     defaultValue={(
-                                      variant.priceCents / 100
+                                      (variant.compareAtPriceCents &&
+                                      variant.compareAtPriceCents >
+                                        variant.priceCents
+                                        ? variant.compareAtPriceCents
+                                        : variant.priceCents) / 100
                                     ).toFixed(2)}
                                     min="0.01"
                                     step="0.01"
                                     required
                                   />
                                 </Field>
+                                <Field label="Preço promocional (opcional, MZN)">
+                                  <NumericInput
+                                    className={inputClass}
+                                    name="promoPrice"
+                                    defaultValue={(
+                                      (variant.compareAtPriceCents &&
+                                      variant.compareAtPriceCents >
+                                        variant.priceCents
+                                        ? variant.priceCents
+                                        : 0) / 100
+                                    ).toFixed(2)}
+                                    min="0"
+                                    step="0.01"
+                                  />
+                                </Field>
+                                <Field label="Avisar quando o stock chegar a">
+                                  <NumericInput
+                                    className={inputClass}
+                                    name="lowStockThreshold"
+                                    defaultValue={String(
+                                      variant.lowStockThreshold,
+                                    )}
+                                    min="0"
+                                    max="1000000"
+                                    step="1"
+                                    required
+                                  />
+                                </Field>
+                                <Field label="Substituir fotos (até 4)">
+                                  <input
+                                    className={`${inputClass} py-2`}
+                                    type="file"
+                                    name="images"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    multiple
+                                  />
+                                </Field>
+                                <label className="text-muted-foreground flex items-center gap-2 self-end text-sm">
+                                  <input type="checkbox" name="removeImages" />
+                                  Remover fotos existentes
+                                </label>
+                                <p className="text-muted-foreground self-end text-xs">
+                                  Enviar novas fotos substitui as atuais. PNG,
+                                  JPEG ou WebP, até 1,5 MB cada.
+                                </p>
                                 <div className="flex items-end">
                                   <Button type="submit" variant="outline">
                                     Guardar e reenviar para revisão

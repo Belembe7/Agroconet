@@ -456,6 +456,7 @@ model Product {
   description     String?
   brand           String?
   status          ProductStatus @default(DRAFT)
+  isFeatured      Boolean       @default(false) @map("is_featured")
   rejectionReason String?       @map("rejection_reason")
   reviewedById    String?       @map("reviewed_by_id") @db.Uuid
   reviewedAt      DateTime?     @map("reviewed_at")

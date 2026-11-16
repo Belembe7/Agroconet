@@ -41,6 +41,12 @@ export function normalizeLandingQuery(input: {
   };
 }
 
+export function normalizeLandingPage(input: string | string[] | undefined) {
+  const rawPage = typeof input === "string" ? input : "1";
+  const page = /^\d{1,6}$/.test(rawPage) ? Number(rawPage) : 1;
+  return Number.isSafeInteger(page) && page > 0 ? page : 1;
+}
+
 /** Public read model: only published products from approved sellers are exposed. */
 export class LandingService {
   constructor(
@@ -77,42 +83,54 @@ export class LandingService {
     });
   }
   async highlights(query: { q: string; category: string }) {
-    const products = await this.db.product.findMany({
-      where: {
-        status: "ACTIVE",
+    const result = await this.highlightPage({ ...query, page: 1 });
+    return result.products;
+  }
+
+  async highlightPage(query: { q: string; category: string; page: number }) {
+    const where = {
+      status: "ACTIVE",
+      deletedAt: null,
+      category: {
+        isActive: true,
         deletedAt: null,
-        category: {
-          isActive: true,
-          deletedAt: null,
-          ...(query.category ? { slug: query.category } : {}),
-        },
-        seller: {
-          status: "APPROVED",
-          deletedAt: null,
-          user: { status: "ACTIVE", deletedAt: null },
-        },
-        variants: { some: { isActive: true, deletedAt: null } },
-        ...(query.q
-          ? {
-              OR: [
-                { name: { contains: query.q, mode: "insensitive" as const } },
-                { brand: { contains: query.q, mode: "insensitive" as const } },
-                {
-                  description: {
-                    contains: query.q,
-                    mode: "insensitive" as const,
-                  },
-                },
-              ],
-            }
-          : {}),
+        ...(query.category ? { slug: query.category } : {}),
       },
-      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
-      take: 8,
+      seller: {
+        status: "APPROVED",
+        deletedAt: null,
+        user: { status: "ACTIVE", deletedAt: null },
+      },
+      variants: { some: { isActive: true, deletedAt: null } },
+      ...(query.q
+        ? {
+            OR: [
+              { name: { contains: query.q, mode: "insensitive" as const } },
+              { brand: { contains: query.q, mode: "insensitive" as const } },
+              {
+                description: {
+                  contains: query.q,
+                  mode: "insensitive" as const,
+                },
+              },
+            ],
+          }
+        : {}),
+    } as const;
+    const pageSize = 8;
+    const total = await this.db.product.count({ where });
+    const totalPages = Math.ceil(total / pageSize);
+    const page = Math.min(query.page, Math.max(totalPages, 1));
+    const products = await this.db.product.findMany({
+      where,
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }, { id: "asc" }],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         name: true,
         brand: true,
+        isFeatured: true,
         description: true,
         slug: true,
         category: { select: { name: true } },
@@ -137,7 +155,7 @@ export class LandingService {
         },
       },
     });
-    return products.flatMap((product) => {
+    const items = products.flatMap((product) => {
       const variant = product.variants[0];
       if (!variant) return [];
       const image = product.images[0];
@@ -147,6 +165,7 @@ export class LandingService {
           name: displayName(product.name),
           slug: product.slug,
           brand: product.brand ? displayName(product.brand) : null,
+          isFeatured: product.isFeatured,
           category: displayName(product.category.name),
           imageUrl: image ? publicImageUrl(image.storageKey, image.id) : null,
           imageAlt: image?.alt ? displayName(image.alt) : null,
@@ -167,6 +186,7 @@ export class LandingService {
         },
       ];
     });
+    return { products: items, total, page, pageSize, totalPages };
   }
   async contacts() {
     const setting = await this.db.systemSetting.findUnique({

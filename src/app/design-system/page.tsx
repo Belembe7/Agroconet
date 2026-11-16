@@ -14,6 +14,7 @@ import {
   MoveUpRight,
 } from "lucide-react";
 import { Brand } from "@/components/layout/brand";
+import { PageBackButton } from "@/components/layout/page-back-button";
 import { DesignSystemDemo } from "@/components/shared/design-system-demo";
 
 export const metadata: Metadata = {
@@ -47,6 +48,7 @@ export default function DesignSystemPage() {
   if (process.env.NODE_ENV !== "development") notFound();
   return (
     <div className="creative-guide">
+      <PageBackButton />
       <div className="guide-ribbon">
         <span className="inline-flex items-center gap-2">
           <span className="size-1.5 rounded-full bg-current" /> UMA NOVA ENERGIA

@@ -9,11 +9,15 @@ export async function getLandingCategories() {
   cacheTag("landing", "categories");
   return service.categories();
 }
-export async function getLandingHighlights(q: string, category: string) {
+export async function getLandingHighlights(
+  q: string,
+  category: string,
+  page: number,
+) {
   "use cache";
   cacheLife("minutes");
   cacheTag("landing", "products");
-  return service.highlights({ q, category });
+  return service.highlightPage({ q, category, page });
 }
 export async function getPublicContacts() {
   "use cache";
