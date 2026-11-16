@@ -15,9 +15,7 @@ describe("demo catalogue product photographs", () => {
       assigned.filter(({ asset }) => !asset).map(({ name }) => name),
     ).toEqual([]);
 
-    const imageSlots = assigned.map(({ asset }) =>
-      asset ? `${asset.src}#${asset.position ?? "full"}` : "missing",
-    );
+    const imageSlots = assigned.map(({ asset }) => asset?.src ?? "missing");
     expect(new Set(imageSlots).size).toBe(PRODUCTS.length);
 
     for (const { asset } of assigned) {
